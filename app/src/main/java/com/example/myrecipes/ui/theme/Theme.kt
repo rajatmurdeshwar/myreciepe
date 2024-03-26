@@ -1,4 +1,4 @@
-package com.example.myreciepes.ui.theme
+package com.example.myrecipes.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -38,7 +38,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun MyReciepesTheme(
+fun MyRecipesTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

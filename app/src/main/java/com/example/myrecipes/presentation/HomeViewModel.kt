@@ -1,9 +1,9 @@
-package com.example.myreciepes.presentation
+package com.example.myrecipes.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myreciepes.Recipe
-import com.example.myreciepes.Repository
+import com.example.myrecipes.Recipe
+import com.example.myrecipes.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,13 +17,13 @@ class HomeViewModel @Inject constructor(
     private val repository: Repository,
 ) : ViewModel() {
 
-    private val _reciepeList = MutableStateFlow(emptyList<Recipe>())
-    val recipeList = _reciepeList.asStateFlow()
+    private val _recipeList = MutableStateFlow(emptyList<Recipe>())
+    val recipeList = _recipeList.asStateFlow()
 
-    fun getReciepeDetails() {
+    fun getRecipeDetails() {
         viewModelScope.launch(IO) {
             repository.getAllRecipes().collectLatest {
-                _reciepeList.tryEmit(it)
+                _recipeList.tryEmit(it)
             }
         }
     }

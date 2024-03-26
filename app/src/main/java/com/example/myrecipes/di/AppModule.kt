@@ -1,10 +1,10 @@
-package com.example.myreciepes.di
+package com.example.myrecipes.di
 
 import android.app.Application
 import androidx.room.Room
-import com.example.myreciepes.AppDatabase
-import com.example.myreciepes.Repository
-import com.example.myreciepes.RepositoryImpl
+import com.example.myrecipes.AppDatabase
+import com.example.myrecipes.Repository
+import com.example.myrecipes.RepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

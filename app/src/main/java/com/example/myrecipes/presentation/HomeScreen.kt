@@ -1,4 +1,4 @@
-package com.example.myreciepes.presentation
+package com.example.myrecipes.presentation
 
 
 import androidx.compose.foundation.layout.Column
@@ -21,12 +21,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-import com.example.myreciepes.R
-import com.example.myreciepes.Recipe
+import com.example.myrecipes.R
+import com.example.myrecipes.Recipe
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier,viewModel: HomeViewModel = hiltViewModel()) {
-    viewModel.getReciepeDetails()
+    viewModel.getRecipeDetails()
     val itemViewStates by viewModel.recipeList.collectAsStateWithLifecycle()
 
     SimpleComposable(modifier = modifier,itemViewStates)

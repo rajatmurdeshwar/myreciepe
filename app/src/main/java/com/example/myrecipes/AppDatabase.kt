@@ -1,4 +1,4 @@
-package com.example.myreciepes
+package com.example.myrecipes
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

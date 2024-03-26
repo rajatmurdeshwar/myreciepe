@@ -1,7 +1,6 @@
-package com.example.myreciepes
+package com.example.myrecipes
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
@@ -9,6 +8,6 @@ import kotlinx.coroutines.flow.Flow
 interface Dao  {
 
     @Query("SELECT * FROM recipe")
-    fun getAllRecipes(): Flow<List<Recipe>>
+    suspend fun getAllRecipes(): Flow<List<Recipe>>
 
 }

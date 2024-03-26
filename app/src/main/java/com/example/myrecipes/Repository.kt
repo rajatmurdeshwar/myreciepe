@@ -1,4 +1,4 @@
-package com.example.myreciepes
+package com.example.myrecipes
 
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
