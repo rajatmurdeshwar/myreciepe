@@ -11,6 +11,4 @@ interface Dao  {
     @Query("SELECT * FROM recipe")
     fun getAllRecipes(): Flow<List<Recipe>>
 
-    @Insert
-    suspend fun insertRecipe(recipe: Recipe)
 }

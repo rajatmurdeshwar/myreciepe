@@ -11,7 +11,7 @@ interface Repository {
     suspend fun getAllRecipes(): Flow<List<Recipe>>
 }
 
-class RepositoryImp @Inject constructor(
+class RepositoryImpl @Inject constructor(
     private val dao: Dao,
 ) : Repository {
     override suspend fun getAllRecipes(): Flow<List<Recipe>> {

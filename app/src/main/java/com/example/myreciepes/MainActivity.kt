@@ -1,23 +1,23 @@
 package com.example.myreciepes
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
+
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.myreciepes.presentation.HomeScreen
 import com.example.myreciepes.ui.theme.MyReciepesTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("MainActivity","--------------")
         setContent {
             MyReciepesTheme {
                 // A surface container using the 'background' color from the theme
@@ -25,10 +25,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    //Greeting("Rajat")
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-
-                    }
+                    HomeScreen()
                 }
 
             }
@@ -37,21 +34,3 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun ListItem(data: Recipe, modifier: Modifier = Modifier) {
-    Row(modifier.fillMaxWidth()) {
-        Text(text = data.des)
-        Text(text = data.img)
-        Text(text = data.category)
-        Text(text = data.tittle)
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
