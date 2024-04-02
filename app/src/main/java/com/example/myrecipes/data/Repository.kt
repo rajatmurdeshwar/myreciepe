@@ -10,5 +10,7 @@ import javax.inject.Inject
 
 interface Repository {
     suspend fun getAllRecipes(): Flow<List<LocalRecipe>>
+
+    suspend fun getRecipeById(recipeId: Int): Flow<LocalRecipe?>
 }
 

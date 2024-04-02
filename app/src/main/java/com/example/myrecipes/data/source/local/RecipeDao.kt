@@ -10,4 +10,7 @@ interface RecipeDao  {
     @Query("SELECT * FROM recipe")
     fun getAllRecipes(): Flow<List<LocalRecipe>>
 
+    @Query("SELECT * FROM recipe WHERE uid = :recipeId")
+     fun getById(recipeId: Int): Flow<LocalRecipe?>
+
 }

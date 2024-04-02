@@ -17,4 +17,10 @@ class RepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getRecipeById(recipeId: Int): Flow<LocalRecipe?> {
+        return withContext(Dispatchers.IO) {
+            dao.getById(recipeId)
+        }
+    }
+
 }

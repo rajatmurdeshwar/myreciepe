@@ -1,9 +1,9 @@
 package com.example.myrecipes.presentation
 
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,20 +28,24 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 
 import com.example.myrecipes.R
+import com.example.myrecipes.data.source.Recipe
 import com.example.myrecipes.data.source.local.LocalRecipe
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier,viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(modifier: Modifier = Modifier,viewModel: HomeViewModel = hiltViewModel(), onRecipeClick: (LocalRecipe) -> Unit,) {
     viewModel.getRecipeDetails()
     val itemViewStates by viewModel.recipeList.collectAsStateWithLifecycle()
 
-    SimpleComposable(modifier = modifier,itemViewStates)
+    SimpleComposable(modifier = modifier,itemViewStates, onRecipeClick = onRecipeClick)
 
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun MyRecipeListItem(itemViewState: LocalRecipe) {
+fun MyRecipeListItem(
+    itemViewState: LocalRecipe,
+    onRecipeClick: (LocalRecipe) -> Unit,
+    ) {
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -51,6 +55,7 @@ fun MyRecipeListItem(itemViewState: LocalRecipe) {
                 horizontal = dimensionResource(id = R.dimen.horizontal_margin),
                 vertical = dimensionResource(id = R.dimen.list_item_padding),
             )
+            .clickable { onRecipeClick(itemViewState) }
     ) {
         Card(
             colors = CardDefaults.cardColors(
@@ -72,6 +77,7 @@ fun MyRecipeListItem(itemViewState: LocalRecipe) {
 fun SimpleComposable(
     modifier: Modifier = Modifier,
     itemViewStates: List<LocalRecipe>,
+    onRecipeClick: (LocalRecipe) -> Unit,
 ) {
 
     Column(
@@ -88,7 +94,10 @@ fun SimpleComposable(
         )
         LazyColumn(modifier = modifier) {
             items(itemViewStates) {data ->
-                MyRecipeListItem(itemViewState = data)
+                MyRecipeListItem(
+                    itemViewState = data,
+                    onRecipeClick = onRecipeClick,
+                )
 
             }
         }
