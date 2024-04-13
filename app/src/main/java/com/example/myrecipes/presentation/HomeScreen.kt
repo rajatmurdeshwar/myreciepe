@@ -1,15 +1,18 @@
 package com.example.myrecipes.presentation
 
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -17,22 +20,29 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 
 import com.example.myrecipes.R
 import com.example.myrecipes.data.source.Recipe
-import com.example.myrecipes.data.source.local.LocalRecipe
+import com.example.myrecipes.data.source.network.Recipes
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier,viewModel: HomeViewModel = hiltViewModel(), onRecipeClick: (LocalRecipe) -> Unit,) {
+fun HomeScreen(modifier: Modifier = Modifier,viewModel: HomeViewModel = hiltViewModel(), onRecipeClick: (Recipe) -> Unit,) {
     viewModel.getRecipeDetails()
     val itemViewStates by viewModel.recipeList.collectAsStateWithLifecycle()
 
@@ -43,8 +53,8 @@ fun HomeScreen(modifier: Modifier = Modifier,viewModel: HomeViewModel = hiltView
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun MyRecipeListItem(
-    itemViewState: LocalRecipe,
-    onRecipeClick: (LocalRecipe) -> Unit,
+    itemOnline: Recipe,
+    onRecipeClick: (Recipe) -> Unit,
     ) {
 
     Row(
@@ -55,18 +65,40 @@ fun MyRecipeListItem(
                 horizontal = dimensionResource(id = R.dimen.horizontal_margin),
                 vertical = dimensionResource(id = R.dimen.list_item_padding),
             )
-            .clickable { onRecipeClick(itemViewState) }
+            .clickable { onRecipeClick(itemOnline) }
+            .fillMaxSize()
     ) {
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            ),
-            modifier = Modifier
-                .size(width = 240.dp, height = 100.dp)
+            )
+
         ) {
-            Text(text = itemViewState.tittle)
-            
-            GlideImage(model = itemViewState.img, contentDescription = "")
+            val sizeImage by remember { mutableStateOf(IntSize.Zero) }
+
+            val gradient = Brush.verticalGradient(
+                colors = listOf(Color.Transparent.copy(alpha = 0.1f), Color.Black.copy(alpha = 0.5f)),
+                startY = sizeImage.height.toFloat()/3,  // 1/3
+                endY = sizeImage.height.toFloat()
+            )
+            Box(modifier = Modifier
+                .size(width = 240.dp, height = 100.dp)
+            ) {
+                GlideImage(
+                    model = itemOnline.itemImage,
+                    contentDescription = "",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                    failure = placeholder(R.drawable.card_shape)
+                )
+                Box(modifier = Modifier.fillMaxSize()
+                    .background(gradient))
+                Text(
+                    text = itemOnline.title,
+                    color = Color.White,
+                    modifier = Modifier.align(Alignment.BottomCenter))
+
+            }
 
         }
 
@@ -76,8 +108,8 @@ fun MyRecipeListItem(
 @Composable
 fun SimpleComposable(
     modifier: Modifier = Modifier,
-    itemViewStates: List<LocalRecipe>,
-    onRecipeClick: (LocalRecipe) -> Unit,
+    itemOnline: List<Recipe>,
+    onRecipeClick: (Recipe) -> Unit,
 ) {
 
     Column(
@@ -85,18 +117,20 @@ fun SimpleComposable(
             .fillMaxSize()
             .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
     ) {
-        Text(text = "Best Diet",
+        Text(text = "Best Diet Recipes",
             modifier = Modifier.padding(
                 horizontal = dimensionResource(id = R.dimen.list_item_padding),
                 vertical = dimensionResource(id = R.dimen.vertical_margin)
             ),
             style = MaterialTheme.typography.headlineMedium
         )
-        LazyColumn(modifier = modifier) {
-            items(itemViewStates) {data ->
+
+        LazyVerticalGrid(GridCells.Fixed(2),modifier = modifier) {
+            items(itemOnline.size) {data ->
                 MyRecipeListItem(
-                    itemViewState = data,
+                    itemOnline = itemOnline[data],
                     onRecipeClick = onRecipeClick,
+
                 )
 
             }

@@ -3,13 +3,16 @@ package com.example.myrecipes.data.source.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "recipe")
+@Entity(tableName = "recipes")
 data class LocalRecipe(
-    @PrimaryKey(autoGenerate = true)
-    val uid: Int,
-    val img: String,
-    val tittle: String,
-    val des: String,
-    val ing: String,
-    val category: String
+    @PrimaryKey
+    val id: Int,
+    val title: String,
+    val description: String,
+    val category: String,
+    val instructions: String,
+    val itemImage: String,
+    val healthScore: Int,
+    val readyIn: Int,
+    val servings: Int
 )

@@ -18,6 +18,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "RECIPE_BASE_URL", "\"https://api.spoonacular.com/\"")
+        buildConfigField("String", "RECIPE_API_KEY", "\"70d62e58791441b2874bd5dc63393d10\"")
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -60,6 +62,9 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.glide)
+    implementation(libs.jsoup)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.covertor)
 
     // Architecture Components
     implementation(libs.room.runtime)

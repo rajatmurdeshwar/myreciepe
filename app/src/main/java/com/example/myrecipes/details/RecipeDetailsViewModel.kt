@@ -1,9 +1,11 @@
-package com.example.myrecipes
+package com.example.myrecipes.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myrecipes.data.Repository
+import com.example.myrecipes.data.source.Recipe
 import com.example.myrecipes.data.source.local.LocalRecipe
+import com.example.myrecipes.data.toExternal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,13 +19,15 @@ class RecipeDetailsViewModel@Inject constructor(
     private val repository: Repository,
 ) : ViewModel() {
 
-    private val _recipe : MutableStateFlow<LocalRecipe?> = MutableStateFlow(null)
+    private val _recipe : MutableStateFlow<Recipe?> = MutableStateFlow(null)
     val recipe = _recipe.asStateFlow()
 
     fun getRecipeByID(recipeId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getRecipeById(recipeId).collectLatest {
-                _recipe.value = it
+                if (it != null) {
+                    _recipe.value = it.toExternal()
+                }
             }
         }
     }

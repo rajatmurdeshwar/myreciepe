@@ -17,6 +17,8 @@ composeBom = "2023.01.00"
 androidxComposeCompiler = "1.4.3"
 ksp = "1.8.10-1.0.9"
 glide = "1.0.0-beta01"
+retrofit = "2.9.0"
+jsoup="1.14.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -50,6 +52,9 @@ hilt-android-core = { group = "com.google.dagger", name = "hilt-android", versio
 hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 glide = {group = "com.github.bumptech.glide", name="compose", version.ref= "glide" }
+retrofit = {group = "com.squareup.retrofit2", name="retrofit", version.ref= "retrofit" }
+retrofit-covertor = {group = "com.squareup.retrofit2", name="converter-gson", version.ref= "retrofit" }
+jsoup = {group = "org.jsoup",name="jsoup", version.ref="jsoup"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
