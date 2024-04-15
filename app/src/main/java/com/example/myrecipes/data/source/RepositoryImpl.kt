@@ -6,6 +6,8 @@ import com.example.myrecipes.data.source.local.LocalRecipe
 import com.example.myrecipes.data.source.local.RecipeDao
 import com.example.myrecipes.data.source.network.NetworkDataSource
 import com.example.myrecipes.data.source.network.NetworkRecipe
+import com.example.myrecipes.data.source.network.RecipeSearchResult
+import com.example.myrecipes.data.toExternal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -16,9 +18,9 @@ class RepositoryImpl @Inject constructor(
     private val dao: RecipeDao,
     private val networkData: NetworkDataSource
 ) : Repository {
-    override suspend fun getAllRecipes(): Flow<List<LocalRecipe>> {
+    override suspend fun getLocalRecipes(): List<Recipe> {
         return withContext(Dispatchers.IO) {
-            dao.getAllRecipes()
+            dao.getAllRecipes().toExternal()
         }
     }
 
@@ -30,15 +32,25 @@ class RepositoryImpl @Inject constructor(
 
     override suspend fun getOnlineRecipes(): NetworkRecipe? {
         return try {
-            networkData.getRecipes()
+            networkData.getRecipes(5)
 
         } catch (e: Exception) {
-            Log.d("RepositoryImpl","Exception "+e.message)
+            Log.e("RepositoryImpl","Exception "+e.message)
             null
         }
     }
 
     override suspend fun insertAllRecipes(recipe: List<LocalRecipe>) {
         dao.insertAll(recipe)
+    }
+
+    override suspend fun searchRecipe(recipeName: String): RecipeSearchResult? {
+        return try {
+            networkData.searchRecipe(recipeName)
+
+        } catch (e: Exception) {
+            Log.e("RepositoryImpl","Exception "+e.message)
+            null
+        }
     }
 }

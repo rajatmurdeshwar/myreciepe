@@ -40,15 +40,15 @@ fun List<LocalRecipe>.toExternal() = map(LocalRecipe::toExternal)
 
 // Network to Local
 fun Recipes.toLocal() = LocalRecipe(
-    id = id!!,
-    title = title!!,
-    description = extractData(summary!!),
-    category = dishTypes[0],
-    instructions = extractData(instructions!!),
-    itemImage = image!!,
-    healthScore = healthScore!!,
-    readyIn = readyInMinutes!!,
-    servings = servings!!
+    id = id ?: 0,
+    title = title ?: "",
+    description = extractData(summary ?: ""),
+    category = dishTypes.firstOrNull() ?: "",
+    instructions = extractData(instructions ?: ""),
+    itemImage = image ?: "",
+    healthScore = healthScore ?: 0,
+    readyIn = readyInMinutes ?: 0,
+    servings = servings ?: 0
 )
 
 fun extractData(dat: String): String {

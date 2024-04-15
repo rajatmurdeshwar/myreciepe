@@ -6,14 +6,14 @@ import com.example.myrecipes.data.source.local.LocalRecipe
 import com.example.myrecipes.data.Repository
 import com.example.myrecipes.data.source.Recipe
 import com.example.myrecipes.data.source.network.NetworkRecipe
-import com.example.myrecipes.data.source.network.Recipes
-import com.example.myrecipes.data.toExternal
 import com.example.myrecipes.data.toLocal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
+
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,9 +28,20 @@ class HomeViewModel @Inject constructor(
     private val repository: Repository,
 ) : ViewModel() {
 
+    private val _recipeUiState = MutableStateFlow(RecipeUiState())
+    val recipeUiState: StateFlow<RecipeUiState> = _recipeUiState
+
     init {
-        getOnlineRecipes()
+        getLocalRecipes()
+        viewModelScope.launch(IO) {
+            recipeList?.collect { recipes ->
+                if (recipes.isEmpty()) {
+                    getOnlineRecipes()
+                }
+            }
+        }
     }
+
 
     private val _recipeList = MutableStateFlow(emptyList<Recipe>())
     val recipeList = _recipeList.asStateFlow()
@@ -39,10 +50,25 @@ class HomeViewModel @Inject constructor(
     val recipeOnlineList = _recipeOnlineList
 
 
-    fun getRecipeDetails() {
+    private fun getLocalRecipes() {
+        _recipeUiState.update {
+            it.copy(isLoading = true)
+        }
         viewModelScope.launch(IO) {
-            repository.getAllRecipes().collectLatest {
-                _recipeList.tryEmit(it.toExternal())
+            repository.getLocalRecipes().let { list ->
+            if (list !=null){
+                _recipeUiState.update {
+                    it.copy(
+                        items = list,
+                        isLoading = false
+                    )
+                }
+            } else{
+                _recipeUiState.update {
+                    it.copy(isLoading = false)
+                }
+            }
+
             }
         }
     }
@@ -51,7 +77,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(IO) {
             val onlineRecipes = repository.getOnlineRecipes()
             onlineRecipes?.let {
-                _recipeOnlineList.emit(it)
+                _recipeOnlineList?.emit(it)
                 updateRecipes(it.recipes.toLocal())
             }
 

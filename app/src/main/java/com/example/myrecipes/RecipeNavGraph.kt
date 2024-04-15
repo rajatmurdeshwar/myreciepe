@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.myrecipes.RecipeDestinationsArgs.RECIPE_ID_ARG
+import com.example.myrecipes.RecipeSearch.RECIPE_SEARCH_ROUTE
 import com.example.myrecipes.details.RecipeDetailScreen
 import com.example.myrecipes.presentation.HomeScreen
 
@@ -37,7 +38,10 @@ fun RecipeNavGraph(
                     navActions.navigateToRecipeDetail(
                         it1
                     )
-                } }
+                } },
+                onSearchButtonClick = {
+                    navActions.navigateToSearchScreen()
+                }
             )
         }
 
@@ -52,6 +56,14 @@ fun RecipeNavGraph(
         ) { navBackStackEntry ->
             val recipeId = navBackStackEntry.arguments?.getInt(RECIPE_ID_ARG)
             recipeId?.let { RecipeDetailScreen(recipeId = it,onBack = { navController.popBackStack() },) }
+        }
+
+        composable(
+            RECIPE_SEARCH_ROUTE
+
+        ) { navBackStackEntry ->
+
+            navActions.navigateToHome()
         }
     }
 }

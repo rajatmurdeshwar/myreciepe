@@ -11,7 +11,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.myrecipes"
+        applicationId = "com.murdeshwar.myrecipes"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -47,6 +47,9 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.2"
     }
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
 }
 
 dependencies {
@@ -59,7 +62,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation(libs.androidx.material3.android)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.glide)
     implementation(libs.jsoup)

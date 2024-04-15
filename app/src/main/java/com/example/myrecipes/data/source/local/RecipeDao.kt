@@ -16,7 +16,7 @@ interface RecipeDao  {
     suspend fun insertAll(recipe: List<LocalRecipe>)
 
     @Query("SELECT * FROM recipes")
-    fun getAllRecipes(): Flow<List<LocalRecipe>>
+    fun getAllRecipes(): List<LocalRecipe>
 
     @Query("SELECT * FROM recipes WHERE id = :recipeId")
      fun getById(recipeId: Int): Flow<LocalRecipe?>

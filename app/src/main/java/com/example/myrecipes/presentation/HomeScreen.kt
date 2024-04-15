@@ -1,7 +1,6 @@
 package com.example.myrecipes.presentation
 
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,8 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,14 +40,21 @@ import com.bumptech.glide.integration.compose.placeholder
 
 import com.example.myrecipes.R
 import com.example.myrecipes.data.source.Recipe
-import com.example.myrecipes.data.source.network.Recipes
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier,viewModel: HomeViewModel = hiltViewModel(), onRecipeClick: (Recipe) -> Unit,) {
-    viewModel.getRecipeDetails()
-    val itemViewStates by viewModel.recipeList.collectAsStateWithLifecycle()
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = hiltViewModel(),
+    onRecipeClick: (Recipe) -> Unit,
+    onSearchButtonClick: () -> Unit
+) {
+    val itemViewStates by viewModel.recipeUiState.collectAsStateWithLifecycle()
 
-    SimpleComposable(modifier = modifier,itemViewStates, onRecipeClick = onRecipeClick)
+    SimpleComposable(
+        modifier = modifier,
+        itemViewStates,
+        onRecipeClick = onRecipeClick,
+        onSearchButtonClick = onSearchButtonClick)
 
 }
 
@@ -91,7 +99,8 @@ fun MyRecipeListItem(
                     contentScale = ContentScale.Crop,
                     failure = placeholder(R.drawable.card_shape)
                 )
-                Box(modifier = Modifier.fillMaxSize()
+                Box(modifier = Modifier
+                    .fillMaxSize()
                     .background(gradient))
                 Text(
                     text = itemOnline.title,
@@ -108,8 +117,9 @@ fun MyRecipeListItem(
 @Composable
 fun SimpleComposable(
     modifier: Modifier = Modifier,
-    itemOnline: List<Recipe>,
+    recipeUiState: RecipeUiState,
     onRecipeClick: (Recipe) -> Unit,
+    onSearchButtonClick: () -> Unit,
 ) {
 
     Column(
@@ -125,14 +135,24 @@ fun SimpleComposable(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        LazyVerticalGrid(GridCells.Fixed(2),modifier = modifier) {
-            items(itemOnline.size) {data ->
-                MyRecipeListItem(
-                    itemOnline = itemOnline[data],
-                    onRecipeClick = onRecipeClick,
+        Button(onClick = onSearchButtonClick) {
+            Text("Search")
+        }
 
-                )
+        if (recipeUiState.isLoading) {
+            // Show loading indicator
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        } else {
 
+            LazyVerticalGrid(GridCells.Fixed(2), modifier = modifier) {
+                items(recipeUiState.items.size) { data ->
+                    MyRecipeListItem(
+                        itemOnline = recipeUiState.items[data],
+                        onRecipeClick = onRecipeClick,
+
+                        )
+
+                }
             }
         }
     }
