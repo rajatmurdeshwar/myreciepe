@@ -7,6 +7,7 @@ import com.example.myrecipes.data.source.local.RecipeDao
 import com.example.myrecipes.data.source.network.NetworkDataSource
 import com.example.myrecipes.data.source.network.NetworkRecipe
 import com.example.myrecipes.data.source.network.RecipeSearchResult
+import com.example.myrecipes.data.source.network.Recipes
 import com.example.myrecipes.data.toExternal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -18,9 +19,9 @@ class RepositoryImpl @Inject constructor(
     private val dao: RecipeDao,
     private val networkData: NetworkDataSource
 ) : Repository {
-    override suspend fun getLocalRecipes(): List<Recipe> {
+    override suspend fun getLocalRecipes(): List<LocalRecipe> {
         return withContext(Dispatchers.IO) {
-            dao.getAllRecipes().toExternal()
+            dao.getAllRecipes()
         }
     }
 
@@ -44,10 +45,23 @@ class RepositoryImpl @Inject constructor(
         dao.insertAll(recipe)
     }
 
+    override suspend fun insertRecipe(recipe: LocalRecipe) {
+        dao.insertRecipe(recipe)
+    }
+
     override suspend fun searchRecipe(recipeName: String): RecipeSearchResult? {
         return try {
             networkData.searchRecipe(recipeName)
 
+        } catch (e: Exception) {
+            Log.e("RepositoryImpl","Exception "+e.message)
+            null
+        }
+    }
+
+    override suspend fun getRecipeDetailsById(id: Int): Recipes? {
+        return try {
+            networkData.getRecipeById(id)
         } catch (e: Exception) {
             Log.e("RepositoryImpl","Exception "+e.message)
             null

@@ -7,6 +7,9 @@ import org.jsoup.Jsoup
 
 
 // External to local
+/**
+ * Converts an external representation of a recipe to a local representation.
+ */
 fun Recipe.toLocal() = LocalRecipe(
     id = id,
     title = title,

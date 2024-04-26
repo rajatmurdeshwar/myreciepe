@@ -12,7 +12,8 @@ import androidx.navigation.navArgument
 import com.example.myrecipes.RecipeDestinationsArgs.RECIPE_ID_ARG
 import com.example.myrecipes.RecipeSearch.RECIPE_SEARCH_ROUTE
 import com.example.myrecipes.details.RecipeDetailScreen
-import com.example.myrecipes.presentation.HomeScreen
+import com.example.myrecipes.home.HomeScreen
+import com.example.myrecipes.search.RecipeSearchScreen
 
 @Composable
 fun RecipeNavGraph(
@@ -46,7 +47,7 @@ fun RecipeNavGraph(
         }
 
         composable(
-            RecipeDestinations.RECIPE_DETAIL_ROUTE,
+            route = RecipeDestinations.RECIPE_DETAIL_ROUTE,
             arguments = listOf(
                 navArgument(RECIPE_ID_ARG) {
                     type = NavType.IntType
@@ -55,15 +56,31 @@ fun RecipeNavGraph(
             )
         ) { navBackStackEntry ->
             val recipeId = navBackStackEntry.arguments?.getInt(RECIPE_ID_ARG)
-            recipeId?.let { RecipeDetailScreen(recipeId = it,onBack = { navController.popBackStack() },) }
+            recipeId?.let {
+                RecipeDetailScreen(
+                    recipeId = it,
+                    onBack = {
+                        navController.popBackStack()
+                             },
+                    )
+            }
         }
 
         composable(
-            RECIPE_SEARCH_ROUTE
+            route = RECIPE_SEARCH_ROUTE
 
-        ) { navBackStackEntry ->
+        ) {
 
-            navActions.navigateToHome()
+            RecipeSearchScreen(
+                onRecipeClick = { recipeId ->
+                        navActions.navigateToRecipeDetail(
+                            recipeId
+                        )
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

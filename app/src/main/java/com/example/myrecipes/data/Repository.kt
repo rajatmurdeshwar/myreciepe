@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 
 interface Repository {
-    suspend fun getLocalRecipes(): List<Recipe>?
+    suspend fun getLocalRecipes(): List<LocalRecipe>?
 
     suspend fun getRecipeById(recipeId: Int): Flow<LocalRecipe?>
 
@@ -21,6 +21,10 @@ interface Repository {
 
     suspend fun insertAllRecipes(recipe: List<LocalRecipe>)
 
+    suspend fun insertRecipe(recipe: LocalRecipe)
+
     suspend fun searchRecipe(recipeName: String): RecipeSearchResult?
+
+    suspend fun getRecipeDetailsById(id: Int): Recipes?
 }
 

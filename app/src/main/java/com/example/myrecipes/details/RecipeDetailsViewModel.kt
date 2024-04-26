@@ -6,6 +6,7 @@ import com.example.myrecipes.data.Repository
 import com.example.myrecipes.data.source.Recipe
 import com.example.myrecipes.data.source.local.LocalRecipe
 import com.example.myrecipes.data.toExternal
+import com.example.myrecipes.data.toLocal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,20 @@ class RecipeDetailsViewModel@Inject constructor(
             repository.getRecipeById(recipeId).collectLatest {
                 if (it != null) {
                     _recipe.value = it.toExternal()
+                } else {
+                    getRecipeDetailsByID(recipeId)
+                }
+            }
+        }
+    }
+
+    private fun getRecipeDetailsByID(recipeId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val recipeDetail = repository.getRecipeDetailsById(recipeId)
+            recipeDetail.let {
+                _recipe.emit(it?.toExternal())
+                if (it != null) {
+                    repository.insertRecipe(it.toLocal())
                 }
             }
         }

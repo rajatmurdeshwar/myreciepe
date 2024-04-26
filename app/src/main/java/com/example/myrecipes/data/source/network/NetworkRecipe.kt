@@ -5,6 +5,6 @@ import com.google.gson.annotations.SerializedName
 
 data class NetworkRecipe (
 
-  @SerializedName("recipes" ) var recipes : ArrayList<Recipes> = arrayListOf()
+  @SerializedName("recipes" ) var recipes : List<Recipes> = arrayListOf()
 
 )

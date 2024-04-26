@@ -2,6 +2,7 @@ package com.example.myrecipes.data.source.network
 
 
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface NetworkDataSource {
@@ -21,5 +22,12 @@ interface NetworkDataSource {
         @Query("query") query: String,
         @Query("apiKey") apiKey: String = API_KEY
     ): RecipeSearchResult
+
+    @GET("recipes/{id}/information")
+    suspend fun getRecipeById(
+        @Path("id") id: Int,
+        @Query("apiKey") apiKey: String = API_KEY
+    ): Recipes
+
 
 }
