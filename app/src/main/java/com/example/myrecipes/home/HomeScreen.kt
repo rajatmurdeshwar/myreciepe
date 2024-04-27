@@ -2,6 +2,7 @@ package com.example.myrecipes.home
 
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
@@ -41,7 +44,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 
 import com.example.myrecipes.R
-import com.example.myrecipes.RecipeHomeTopAppBar
+import com.example.myrecipes.util.RecipeHomeTopAppBar
 import com.example.myrecipes.data.source.Recipe
 
 @Composable
@@ -59,7 +62,7 @@ fun HomeScreen(
         onRecipeClick = onRecipeClick,
         onSearchButtonClick = onSearchButtonClick,
         onRefreshClick = {
-
+            viewModel.refreshList()
         })
 
 }
@@ -128,56 +131,84 @@ fun SimpleComposable(
     onSearchButtonClick: () -> Unit,
     onRefreshClick: () -> Unit
 ) {
+    Box {
+        // Background Image
+        Image(
+            modifier = Modifier.fillMaxSize(),
+            painter = painterResource(id = R.drawable.home_background),
+            contentDescription = "background_image",
+            contentScale = ContentScale.FillBounds
+        )
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            RecipeHomeTopAppBar(onRefreshClick = onRefreshClick )
-                 }
-
-    ) { padding ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding( padding)
-        ) {
-            Text(text = "Search for Best Diet Recipes",
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(id = R.dimen.list_item_padding),
-                    vertical = dimensionResource(id = R.dimen.vertical_margin)
-                ),
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            Button(
-                onClick = onSearchButtonClick,
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(id = R.dimen.list_item_padding),
-                    vertical = dimensionResource(id = R.dimen.vertical_margin)
-                )
+        // Scaffold with TopAppBar
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            topBar = {
+                RecipeHomeTopAppBar(onRefreshClick = onRefreshClick)
+            },
+            containerColor = Color.Transparent
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
             ) {
-                Text("Search")
-            }
+                // Title
+                Text(
+                    text = "Search for Best Diet Recipes",
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                        vertical = dimensionResource(id = R.dimen.vertical_margin)
+                    ),
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
-            if (recipeUiState.isLoading) {
-                // Show loading indicator
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else {
+                // Search Button
+                Button(
+                    onClick = onSearchButtonClick,
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                        vertical = dimensionResource(id = R.dimen.vertical_margin)
+                    )
+                ) {
+                    Text("Search")
+                }
 
-                LazyVerticalGrid(GridCells.Fixed(2), modifier = modifier) {
-                    items(recipeUiState.items.size) { data ->
-                        MyRecipeListItem(
-                            itemOnline = recipeUiState.items[data],
-                            onRecipeClick = onRecipeClick,
+                // Saved Recipes Title
+                Text(
+                    text = "Saved Recipes",
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                        vertical = dimensionResource(id = R.dimen.vertical_margin)
+                    ),
+                    style = MaterialTheme.typography.headlineMedium
+                )
 
-                            )
+                // Show tray image if no recipes are available
+                if (recipeUiState.items.isEmpty()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.tray_on_hand),
+                        contentDescription = stringResource(id = R.string.tray_on_hand)
+                    )
+                }
 
+                // Show loading indicator if data is loading, otherwise show recipe list
+                if (recipeUiState.isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                } else {
+                    LazyVerticalGrid(GridCells.Fixed(2)) {
+                        items(recipeUiState.items.size) { index ->
+                            val recipe = recipeUiState.items.getOrNull(index)
+                            recipe?.let {
+                                MyRecipeListItem(
+                                    itemOnline = it,
+                                    onRecipeClick = onRecipeClick
+                                )
+                            }
+                        }
                     }
                 }
             }
+        }
     }
-
-    }
-
-
 }

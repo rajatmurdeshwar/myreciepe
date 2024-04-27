@@ -25,9 +25,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     RecipeNavGraph()
-                    //HomeScreen(onRecipeClick = {
 
-                    //})
                 }
 
             }

@@ -25,8 +25,6 @@ fun RecipeNavGraph(
     }
 ) {
 
-
-
     NavHost(
         navController = navController,
         startDestination = startDestination,

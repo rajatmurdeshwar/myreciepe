@@ -3,4 +3,5 @@
     <string name="recipe_details">Recipe Details</string>
     <string name="menu_back">Back</string>
     <string name="menu_refresh">Refresh</string>
+    <string name="tray_on_hand">Tray on Hand</string>
 </resources>

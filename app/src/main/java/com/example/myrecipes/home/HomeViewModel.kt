@@ -47,7 +47,7 @@ class HomeViewModel @Inject constructor(
             repository.getLocalRecipes().let { list ->
             if (list.isNullOrEmpty()){
                 getOnlineRecipes()
-            } else{
+            } else {
                 Log.d("HomeViewModel","getLocalRecipes "+list.size)
                 _recipeUiState.update {
                     it.copy(
@@ -60,7 +60,6 @@ class HomeViewModel @Inject constructor(
 
             }
         }
-        //getOnlineRecipes()
     }
 
     private fun getOnlineRecipes() {
@@ -95,6 +94,10 @@ class HomeViewModel @Inject constructor(
                 recipeList
             )
         }
+    }
+
+    fun refreshList() {
+        getLocalRecipes()
     }
 
     override fun onCleared() {

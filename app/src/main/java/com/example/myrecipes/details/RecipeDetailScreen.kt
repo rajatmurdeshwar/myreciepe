@@ -26,9 +26,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.example.myrecipes.RecipeDetailTopAppBar
+import com.example.myrecipes.util.RecipeDetailTopAppBar
 import com.example.myrecipes.data.source.Recipe
-import com.example.myrecipes.data.source.local.LocalRecipe
 
 
 @Composable
