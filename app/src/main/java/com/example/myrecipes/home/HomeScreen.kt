@@ -4,6 +4,7 @@ package com.example.myrecipes.home
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -39,6 +43,7 @@ import androidx.compose.ui.unit.dp
 
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
@@ -56,13 +61,16 @@ fun HomeScreen(
 ) {
     val itemViewStates by viewModel.recipeUiState.collectAsStateWithLifecycle()
     Log.d("HomeScreen","ItemUI "+itemViewStates.items.size)
-    SimpleComposable(
+    ContentComposable(
         modifier = modifier,
         itemViewStates,
         onRecipeClick = onRecipeClick,
         onSearchButtonClick = onSearchButtonClick,
         onRefreshClick = {
             viewModel.refreshList()
+        },
+        onCategoryClick = {
+            viewModel.getOnlineRecipesWithTags(it)
         })
 
 }
@@ -114,7 +122,8 @@ fun MyRecipeListItem(
                 Text(
                     text = itemOnline.title,
                     color = Color.White,
-                    modifier = Modifier.align(Alignment.BottomCenter))
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    maxLines = 1)
 
             }
 
@@ -124,12 +133,13 @@ fun MyRecipeListItem(
 
 }
 @Composable
-fun SimpleComposable(
+fun ContentComposable(
     modifier: Modifier = Modifier,
     recipeUiState: RecipeUiState,
     onRecipeClick: (Recipe) -> Unit,
     onSearchButtonClick: () -> Unit,
-    onRefreshClick: () -> Unit
+    onRefreshClick: () -> Unit,
+    onCategoryClick: (String) -> Unit
 ) {
     Box {
         // Background Image
@@ -148,11 +158,21 @@ fun SimpleComposable(
             },
             containerColor = Color.Transparent
         ) { paddingValues ->
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
+                Text(
+                    text = "Categories",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                        vertical = dimensionResource(id = R.dimen.vertical_margin)
+                    )
+                )
+                RecipeCategoryComposable(onCategoryClick = onCategoryClick)
                 // Title
                 Text(
                     text = "Search for Best Diet Recipes",
@@ -210,5 +230,58 @@ fun SimpleComposable(
                 }
             }
         }
+    }
+}
+
+
+@Composable
+fun RecipeCategoryComposable(
+    onCategoryClick: (String) -> Unit,
+) {
+    val categories = listOf(
+        Pair("Vegetarian", R.drawable.veggies),
+        Pair("Breakfast", R.drawable.breakfast),
+        Pair("Lunch", R.drawable.lunch),
+        Pair("Dinner", R.drawable.dinner),
+        Pair("Appetizer", R.drawable.appetizer),
+        Pair("Salad", R.drawable.salad),
+        Pair("Dessert", R.drawable.dessert)
+    )
+    LazyRow(
+        modifier = Modifier.padding(
+            horizontal = dimensionResource(id = R.dimen.list_item_padding),
+            vertical = dimensionResource(id = R.dimen.vertical_margin)
+        )
+    ) {
+        items(categories.size) { category ->
+            CircularImageWithText(keyValue = categories[category], onCategoryClick = onCategoryClick )
+        }
+    }
+}
+
+@Composable
+fun CircularImageWithText(
+    keyValue: Pair<String, Int>,
+    modifier: Modifier = Modifier,
+    onCategoryClick: (String) -> Unit
+) {
+    val (text, resId) = keyValue
+    Column(modifier = Modifier.padding(
+        horizontal = dimensionResource(id = R.dimen.list_item_padding),
+        vertical = dimensionResource(id = R.dimen.vertical_margin)
+    )
+    ) {
+        Image(
+            painter =painterResource(id =  resId),
+            contentDescription = "Image",
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+                .size(64.dp)
+                .clip(CircleShape)
+                .border(1.dp, Color.Gray, CircleShape)
+                .clickable {
+                    onCategoryClick(text)
+                })
+        Text(text = text)
     }
 }

@@ -17,6 +17,14 @@ interface NetworkDataSource {
         @Query("apiKey") apiKey: String = API_KEY
     ): NetworkRecipe
 
+    @GET("recipes/random")
+    suspend fun getRecipesWithTags(
+        @Query("number") number: Int,
+        @Query("includeTags") tags: String,
+        @Query("apiKey") apiKey: String = API_KEY
+
+    ): NetworkRecipe
+
     @GET("recipes/complexSearch")
     suspend fun searchRecipe(
         @Query("query") query: String,

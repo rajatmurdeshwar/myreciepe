@@ -25,6 +25,8 @@ interface Repository {
 
     suspend fun searchRecipe(recipeName: String): RecipeSearchResult?
 
+    suspend fun getOnlineRecipesWithTags(tags: String): NetworkRecipe?
+
     suspend fun getRecipeDetailsById(id: Int): Recipes?
 }
 

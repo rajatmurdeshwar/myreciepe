@@ -1,23 +1,41 @@
 package com.example.myrecipes.search
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.myrecipes.R
+import com.example.myrecipes.data.source.network.RecipeSearch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     fun RecipeSearchScreen(viewModel: RecipeSearchViewModel = hiltViewModel(), onRecipeClick: (Int) -> Unit, onBack: () -> Unit) {
@@ -30,34 +48,122 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
         Scaffold(
             topBar = {
-                SearchBar(
-                    query = searchText,//text showed on SearchBar
-                    onQueryChange = viewModel::onSearchTextChange, //update the value of searchText
-                    onSearch = viewModel::onSearchTextChange, //the callback to be invoked when the input service triggers the ImeAction.Search action
-                    active = isSearching, //whether the user is searching or not
-                    onActiveChange = { viewModel.onToogleSearch() }, //the callback to be invoked when this search bar's active state is changed
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
-                ) {
-                    LazyColumn {
-                        items(recipeList.size) { recipe ->
-                            ClickableText(
-                                text = AnnotatedString(recipeList[recipe].title),
-                                onClick = {
-                                    onRecipeClick(recipeList[recipe].id)
-                                },
-                                modifier = Modifier.padding(
-                                    start = 8.dp,
-                                    top = 4.dp,
-                                    end = 8.dp,
-                                    bottom = 4.dp
-                                )
-                            )
-                        }
-                    }
-                }
+                EmbeddedSearchBar(
+                    searchText = searchText,
+                    onQueryChange = viewModel::onSearchTextChange,
+                    isSearchActive = isSearching,
+                    onActiveChanged = { viewModel.onToogleSearch() },
+                    recipeList = recipeList,
+                    onRecipeClick = onRecipeClick
+                )
             }
         ) {
         }
     }
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun EmbeddedSearchBar(
+    searchText: String,
+    onQueryChange: (String) -> Unit,
+    isSearchActive: Boolean,
+    onActiveChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    onSearch: ((String) -> Unit)? = null,
+    recipeList: List<RecipeSearch>,
+    onRecipeClick: (Int) -> Unit
+) {
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    val activeChanged: (Boolean) -> Unit = { active ->
+        searchQuery = ""
+        onQueryChange("")
+        onActiveChanged(active)
+    }
+    SearchBar(
+        query = searchText,
+        onQueryChange = { query ->
+            searchQuery = query
+            onQueryChange(query)
+        },
+        onSearch = onSearch ?: { activeChanged(false) },
+        active = isSearchActive,
+        onActiveChange = activeChanged,
+        modifier = if (isSearchActive) {
+            modifier
+                .animateContentSize(spring(stiffness = Spring.StiffnessHigh))
+        } else {
+            modifier
+                .padding(start = 12.dp, top = 2.dp, end = 12.dp, bottom = 12.dp)
+                .fillMaxWidth()
+                .animateContentSize(spring(stiffness = Spring.StiffnessHigh))
+        },
+        placeholder = { Text("Search") },
+        leadingIcon = {
+            if (isSearchActive) {
+                IconButton(
+                    onClick = { activeChanged(false) },
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = stringResource(R.string.navigation_action_back_cd),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            } else {
+                Icon(
+                    imageVector = Icons.Rounded.Search,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        },
+        trailingIcon = if (isSearchActive && searchQuery.isNotEmpty()) {
+            {
+                IconButton(
+                    onClick = {
+                        searchQuery = ""
+                        onQueryChange("")
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Close,
+                        contentDescription = stringResource(R.string.search_text_field_clear),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+        } else {
+            null
+        },
+        colors = SearchBarDefaults.colors(
+            containerColor = if (isSearchActive) {
+                MaterialTheme.colorScheme.background
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerLow
+            },
+        ),
+        tonalElevation = 0.dp,
+        windowInsets = if (isSearchActive) {
+            SearchBarDefaults.windowInsets
+        } else {
+            WindowInsets(0.dp)
+        }
+    ) {
+        LazyColumn {
+            items(recipeList.size) { recipe ->
+                ClickableText(
+                    text = AnnotatedString(recipeList[recipe].title),
+                    onClick = {
+                        onRecipeClick(recipeList[recipe].id)
+                    },
+                    modifier = Modifier.padding(
+                        start = 8.dp,
+                        top = 4.dp,
+                        end = 8.dp,
+                        bottom = 4.dp
+                    )
+                )
+            }
+        }
+    }
+}

@@ -59,6 +59,16 @@ class RepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getOnlineRecipesWithTags(tags: String): NetworkRecipe? {
+        return try {
+            networkData.getRecipesWithTags(10,tags)
+
+        } catch (e: Exception) {
+            Log.e("RepositoryImpl","Exception "+e.message)
+            null
+        }
+    }
+
     override suspend fun getRecipeDetailsById(id: Int): Recipes? {
         return try {
             networkData.getRecipeById(id)

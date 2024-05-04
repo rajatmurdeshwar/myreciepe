@@ -26,6 +26,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
+import com.example.myrecipes.R
 import com.example.myrecipes.util.RecipeDetailTopAppBar
 import com.example.myrecipes.data.source.Recipe
 
@@ -67,7 +69,9 @@ fun DetailComposable(
             GlideImage(
                 model = recipe.itemImage,
                 contentDescription = "",
-                modifier = Modifier.fillMaxSize())
+                modifier = Modifier.fillMaxSize(),
+                failure = placeholder(R.drawable.card_shape)
+            )
             // Display recipe details in Rows
             RecipeDetailRow("Servings:", recipe.servings.toString())
             RecipeDetailRow("Health Score:", recipe.healthScore.toString())

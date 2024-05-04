@@ -4,4 +4,6 @@
     <string name="menu_back">Back</string>
     <string name="menu_refresh">Refresh</string>
     <string name="tray_on_hand">Tray on Hand</string>
+    <string name="search_text_field_clear">Clear</string>
+    <string name="navigation_action_back_cd">Back Button</string>
 </resources>

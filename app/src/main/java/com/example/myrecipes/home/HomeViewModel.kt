@@ -88,6 +88,33 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun getOnlineRecipesWithTags(tags: String) {
+        _recipeUiState.update {
+            it.copy(isLoading = true)
+        }
+        viewModelScope.launch(IO) {
+            try {
+                val onlineRecipes = repository.getOnlineRecipesWithTags(tags)
+                Log.d("HomeViewModel", "online $tags")
+                onlineRecipes?.let {list ->
+                    _recipeUiState.update {
+                        it.copy(
+                            items = list.recipes.toExternal(),
+                            isLoading = false
+                        )
+                    }
+                    //updateRecipes(list.recipes.toLocal())
+                }
+            } catch (e: Exception) {
+                _recipeUiState.value = _recipeUiState.value.copy(
+                    userMessage = "Failed to fetch recipes: ${e.message}",
+                    isLoading = false
+                )
+            }
+
+        }
+    }
+
     private fun updateRecipes(recipeList: List<LocalRecipe>) {
         viewModelScope.launch(IO) {
             repository.insertAllRecipes(
