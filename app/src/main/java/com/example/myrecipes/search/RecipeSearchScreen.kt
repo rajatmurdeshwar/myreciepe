@@ -33,7 +33,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myrecipes.R
-import com.example.myrecipes.data.source.network.RecipeSearch
+import com.example.myrecipes.data.source.RecipeSearchData
 
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -70,7 +70,7 @@ fun EmbeddedSearchBar(
     onActiveChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     onSearch: ((String) -> Unit)? = null,
-    recipeList: List<RecipeSearch>,
+    recipeList: List<RecipeSearchData>,
     onRecipeClick: (Int) -> Unit
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }

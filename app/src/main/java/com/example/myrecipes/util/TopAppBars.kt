@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,7 +48,7 @@ fun RecipeDetailTopAppBar(titleName:String,onBack: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeHomeTopAppBar(onRefreshClick: () -> Unit) {
+fun RecipeHomeTopAppBar(onRefreshClick: () -> Unit, onSearchButtonClick: () -> Unit) {
     TopAppBar(
         title = {
             Text(text = "RecipeMaker")
@@ -61,6 +62,12 @@ fun RecipeHomeTopAppBar(onRefreshClick: () -> Unit) {
                              Icon(Icons.Filled.Refresh, stringResource(id = R.string.menu_refresh) )
 
                          }
+            IconButton(onClick =
+                onSearchButtonClick
+            ) {
+                Icon(Icons.Filled.Search, stringResource(id = R.string.menu_search))
+
+            }
         },
         modifier = Modifier.fillMaxWidth()
     )

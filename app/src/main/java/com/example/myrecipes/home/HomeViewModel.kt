@@ -3,25 +3,20 @@ package com.example.myrecipes.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myrecipes.data.source.local.LocalRecipe
 import com.example.myrecipes.data.Repository
 import com.example.myrecipes.data.source.Recipe
-import com.example.myrecipes.data.source.network.NetworkRecipe
-import com.example.myrecipes.data.toExternal
-import com.example.myrecipes.data.toLocal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class RecipeUiState(
-    val items: List<Recipe> = emptyList(),
+    val items: List<Recipe?> = emptyList(),
     val isLoading: Boolean = false,
     val userMessage: String? = null
 )
@@ -51,7 +46,7 @@ class HomeViewModel @Inject constructor(
                 Log.d("HomeViewModel","getLocalRecipes "+list.size)
                 _recipeUiState.update {
                     it.copy(
-                        items = list.toExternal(),
+                        items = list,
                         isLoading = false
                     )
                 }
@@ -72,11 +67,11 @@ class HomeViewModel @Inject constructor(
                 onlineRecipes?.let {list ->
                     _recipeUiState.update {
                         it.copy(
-                            items = list.recipes.toExternal(),
+                            items = list,
                             isLoading = false
                         )
                     }
-                    updateRecipes(list.recipes.toLocal())
+                    updateRecipes(list)
                 }
             } catch (e: Exception) {
                 _recipeUiState.value = _recipeUiState.value.copy(
@@ -99,7 +94,7 @@ class HomeViewModel @Inject constructor(
                 onlineRecipes?.let {list ->
                     _recipeUiState.update {
                         it.copy(
-                            items = list.recipes.toExternal(),
+                            items = list,
                             isLoading = false
                         )
                     }
@@ -115,11 +110,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun updateRecipes(recipeList: List<LocalRecipe>) {
+    private fun updateRecipes(recipeList: List<Recipe?>) {
         viewModelScope.launch(IO) {
-            repository.insertAllRecipes(
-                recipeList
-            )
+            val nonNullList = recipeList.filterNotNull()
+            repository.insertAllRecipes(nonNullList)
         }
     }
 

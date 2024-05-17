@@ -1,7 +1,9 @@
 package com.example.myrecipes.data
 
 import com.example.myrecipes.data.source.Recipe
+import com.example.myrecipes.data.source.RecipeSearchData
 import com.example.myrecipes.data.source.local.LocalRecipe
+import com.example.myrecipes.data.source.network.RecipeSearch
 import com.example.myrecipes.data.source.network.Recipes
 import org.jsoup.Jsoup
 
@@ -68,3 +70,13 @@ fun Recipes.toExternal() = toLocal().toExternal()
 
 @JvmName("networkToExternal")
 fun List<Recipes>.toExternal() = map(Recipes::toExternal)
+
+// Adding RecipeSearch to RecipeSearchData conversion
+fun RecipeSearch.toRecipeSearchData() = RecipeSearchData(
+    id = id,
+    title = title,
+    image = image,
+    imageType = imageType
+)
+
+fun List<RecipeSearch>.toRecipeSearchDataList() = map(RecipeSearch::toRecipeSearchData)

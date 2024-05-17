@@ -27,7 +27,7 @@ class RecipeDetailsViewModel@Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             repository.getRecipeById(recipeId).collectLatest {
                 if (it != null) {
-                    _recipe.value = it.toExternal()
+                    _recipe.value = it
                 } else {
                     getRecipeDetailsByID(recipeId)
                 }
@@ -39,9 +39,9 @@ class RecipeDetailsViewModel@Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val recipeDetail = repository.getRecipeDetailsById(recipeId)
             recipeDetail.let {
-                _recipe.emit(it?.toExternal())
+                _recipe.emit(it)
                 if (it != null) {
-                    repository.insertRecipe(it.toLocal())
+                    repository.insertRecipe(it)
                 }
             }
         }
