@@ -43,7 +43,7 @@ class HomeViewModel @Inject constructor(
             if (list.isNullOrEmpty()){
                 getOnlineRecipes()
             } else {
-                Log.d("HomeViewModel","getLocalRecipes "+list.size)
+                //Log.d("HomeViewModel","getLocalRecipes "+list.size)
                 _recipeUiState.update {
                     it.copy(
                         items = list,

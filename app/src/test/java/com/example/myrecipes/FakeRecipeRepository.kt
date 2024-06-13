@@ -7,15 +7,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import java.lang.Exception
 
 class FakeRecipeRepository: Repository {
 
     private var shouldThrowError = false
 
-    private val _savedRecipe = MutableStateFlow(LinkedHashMap<String, Recipe>())
-    val savedRecipe: StateFlow<LinkedHashMap<String, Recipe>> = _savedRecipe.asStateFlow()
+    private val _savedRecipe = MutableStateFlow(LinkedHashMap<Int, Recipe>())
+    val savedRecipe: StateFlow<LinkedHashMap<Int, Recipe>> = _savedRecipe.asStateFlow()
 
     private val observableRecipes: Flow<List<Recipe>> = savedRecipe.map {
         if (shouldThrowError) {
@@ -25,35 +27,69 @@ class FakeRecipeRepository: Repository {
         }
     }
 
+    fun setShouldThrowError(value: Boolean) {
+        shouldThrowError = value
+    }
+
     override suspend fun getLocalRecipes(): List<Recipe>? {
-        TODO("Not yet implemented")
+        if (shouldThrowError) {
+            throw Exception("Test exception")
+        }
+        return observableRecipes.first()
     }
 
     override suspend fun getRecipeById(recipeId: Int): Flow<Recipe?> {
-        TODO("Not yet implemented")
+        return savedRecipe.map { recipes ->
+            recipes[recipeId]
+        }
     }
 
     override suspend fun getOnlineRecipes(): List<Recipe?> {
-        TODO("Not yet implemented")
+        if (shouldThrowError) {
+            throw Exception("Test exception")
+        }
+        return observableRecipes.first()
     }
 
     override suspend fun insertAllRecipes(recipe: List<Recipe>) {
-        TODO("Not yet implemented")
+        _savedRecipe.update { oldRecipe ->
+            val newRecipe = LinkedHashMap(oldRecipe)
+            for (recipee in recipe) {
+                newRecipe[recipee.id] = recipee
+            }
+            newRecipe
+        }
     }
 
     override suspend fun insertRecipe(recipe: Recipe) {
-        TODO("Not yet implemented")
+        _savedRecipe.update { oldRecipes ->
+            val newRecipes = LinkedHashMap(oldRecipes)
+            newRecipes[recipe.id] = recipe
+            newRecipes
+        }
     }
 
     override suspend fun searchRecipe(recipeName: String): List<RecipeSearchData?> {
-        TODO("Not yet implemented")
+        if (shouldThrowError) {
+            throw Exception("Test exception")
+        }
+        return observableRecipes.first()
+            .filter { it.title.contains(recipeName, ignoreCase = true) }
+            .map { RecipeSearchData(it.id, it.title, "","") }
     }
 
     override suspend fun getOnlineRecipesWithTags(tags: String): List<Recipe?> {
-        TODO("Not yet implemented")
+        if (shouldThrowError) {
+            throw Exception("Test exception")
+        }
+        return observableRecipes.first()
+            .filter { it.category.contains(tags) }
     }
 
     override suspend fun getRecipeDetailsById(id: Int): Recipe? {
-        TODO("Not yet implemented")
+        if (shouldThrowError) {
+            throw Exception("Test exception")
+        }
+        return savedRecipe.value[id]
     }
 }

@@ -86,6 +86,7 @@ dependencies {
     testImplementation(libs.androidx.archcore.testing)
     testImplementation(libs.kotlinx.coroutines.android)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.google.truth)
 
 
     debugImplementation(libs.androidx.ui.tooling)

@@ -20,6 +20,7 @@ ksp = "1.8.10-1.0.9"
 glide = "1.0.0-beta01"
 retrofit = "2.9.0"
 jsoup="1.14.3"
+truth = "1.1.2"
 material3Android = "1.2.1"
 
 [libraries]
@@ -47,6 +48,8 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-lifecycle-runtimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 androidx-archcore-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "androidxArchCore" }
+google-truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+
 
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
