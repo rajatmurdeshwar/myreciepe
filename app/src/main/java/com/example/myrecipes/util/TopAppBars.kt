@@ -2,6 +2,7 @@ package com.example.myrecipes.util
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
@@ -35,14 +36,24 @@ import com.example.myrecipes.ui.theme.MyRecipesTheme
 fun RecipeDetailTopAppBar(titleName:String,onBack: () -> Unit) {
     TopAppBar(
         title = {
-            Text(text = titleName)
+            Text(text = titleName,
+                color = MaterialTheme.colorScheme.onPrimary)
         },
         navigationIcon = {
             IconButton(onClick = onBack) {
-                Icon(Icons.Filled.ArrowBack, stringResource(id = R.string.menu_back))
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = stringResource(id = R.string.menu_back),
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
         },
-        modifier = Modifier.fillMaxWidth()
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+    ),
+        modifier = Modifier
     )
 }
 
@@ -51,25 +62,36 @@ fun RecipeDetailTopAppBar(titleName:String,onBack: () -> Unit) {
 fun RecipeHomeTopAppBar(onRefreshClick: () -> Unit, onSearchButtonClick: () -> Unit) {
     TopAppBar(
         title = {
-            Text(text = "RecipeMaker")
+            Text(text = "RecipeMaker",
+                color = MaterialTheme.colorScheme.primary
+            )
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         actions = {
                          IconButton(onClick =  onRefreshClick ) {
-                             Icon(Icons.Filled.Refresh, stringResource(id = R.string.menu_refresh) )
+                             Icon(
+                                 imageVector = Icons.Filled.Refresh,
+                                 contentDescription = stringResource(id = R.string.menu_refresh),
+                                 tint = MaterialTheme.colorScheme.onPrimaryContainer
+                             )
 
                          }
             IconButton(onClick =
                 onSearchButtonClick
             ) {
-                Icon(Icons.Filled.Search, stringResource(id = R.string.menu_search))
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = stringResource(id = R.string.menu_search),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
 
             }
         },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     )
 
 }
@@ -127,7 +149,7 @@ fun RecipeSearchTopAppBar(
 private fun RecipeDetailTopAppBarPreview() {
     MyRecipesTheme {
         Surface {
-            RecipeDetailTopAppBar("",{ })
+            RecipeDetailTopAppBar("Home",{ })
         }
     }
 }

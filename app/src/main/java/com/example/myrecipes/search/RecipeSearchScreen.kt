@@ -34,30 +34,32 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myrecipes.R
 import com.example.myrecipes.data.source.RecipeSearchData
+import com.example.myrecipes.ui.theme.MyRecipesTheme
 
 
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     fun RecipeSearchScreen(viewModel: RecipeSearchViewModel = hiltViewModel(), onRecipeClick: (Int) -> Unit, onBack: () -> Unit) {
 
+        MyRecipesTheme {
+            //Collecting states from ViewModel
+            val searchText by viewModel.searchText.collectAsState()
+            val isSearching by viewModel.isSearching.collectAsState()
+            val recipeList by viewModel.searchList.collectAsState()
 
-        //Collecting states from ViewModel
-        val searchText by viewModel.searchText.collectAsState()
-        val isSearching by viewModel.isSearching.collectAsState()
-        val recipeList by viewModel.searchList.collectAsState()
-
-        Scaffold(
-            topBar = {
-                EmbeddedSearchBar(
-                    searchText = searchText,
-                    onQueryChange = viewModel::onSearchTextChange,
-                    isSearchActive = isSearching,
-                    onActiveChanged = { viewModel.onToogleSearch() },
-                    recipeList = recipeList,
-                    onRecipeClick = onRecipeClick
-                )
+            Scaffold(
+                topBar = {
+                    EmbeddedSearchBar(
+                        searchText = searchText,
+                        onQueryChange = viewModel::onSearchTextChange,
+                        isSearchActive = isSearching,
+                        onActiveChanged = { viewModel.onToogleSearch() },
+                        recipeList = recipeList,
+                        onRecipeClick = onRecipeClick
+                    )
+                }
+            ) {
             }
-        ) {
         }
     }
 
@@ -106,7 +108,7 @@ fun EmbeddedSearchBar(
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                         contentDescription = stringResource(R.string.navigation_action_back_cd),
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 }
             } else {
@@ -128,7 +130,7 @@ fun EmbeddedSearchBar(
                     Icon(
                         imageVector = Icons.Rounded.Close,
                         contentDescription = stringResource(R.string.search_text_field_clear),
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 }
             }
@@ -144,7 +146,8 @@ fun EmbeddedSearchBar(
         ),
         tonalElevation = 0.dp,
         windowInsets = if (isSearchActive) {
-            SearchBarDefaults.windowInsets
+            WindowInsets(0.dp)
+            //SearchBarDefaults.windowInsets
         } else {
             WindowInsets(0.dp)
         }
@@ -161,6 +164,9 @@ fun EmbeddedSearchBar(
                         top = 4.dp,
                         end = 8.dp,
                         bottom = 4.dp
+                    ),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 )
             }

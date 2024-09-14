@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
@@ -38,6 +40,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
@@ -50,6 +53,7 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.example.myrecipes.R
 import com.example.myrecipes.util.RecipeHomeTopAppBar
 import com.example.myrecipes.data.source.Recipe
+import com.example.myrecipes.ui.theme.MyRecipesTheme
 
 @Composable
 fun HomeScreen(
@@ -59,10 +63,10 @@ fun HomeScreen(
     onSearchButtonClick: () -> Unit
 ) {
     val itemViewStates by viewModel.recipeUiState.collectAsStateWithLifecycle()
-    Log.d("HomeScreen","ItemUI "+itemViewStates.items.size)
+    //Log.d("HomeScreen","ItemUI "+itemViewStates.items.size)
     ContentComposable(
         modifier = modifier,
-        itemViewStates,
+        recipeUiState = itemViewStates,
         onRecipeClick = onRecipeClick,
         onSearchButtonClick = onSearchButtonClick,
         onRefreshClick = {
@@ -122,7 +126,9 @@ fun MyRecipeListItem(
                     text = itemOnline.title,
                     color = Color.White,
                     modifier = Modifier.align(Alignment.BottomCenter),
-                    maxLines = 1)
+                    maxLines = 1,
+                    style = MaterialTheme.typography.bodySmall
+                )
 
             }
 
@@ -142,6 +148,19 @@ fun ContentComposable(
 ) {
     var categoryTitle by remember { mutableStateOf("Saved") }
 
+    val isDarkTheme = isSystemInDarkTheme()
+    val gradientColors = if (isDarkTheme) {
+        listOf(Color.Transparent.copy(alpha = 0.1f), Color.Black.copy(alpha = 0.5f))
+    } else {
+        listOf(Color.Transparent.copy(alpha = 0.1f), Color.White.copy(alpha = 0.5f))
+    }
+
+    val gradient = Brush.verticalGradient(
+        colors = gradientColors,
+        startY = 0f,
+        endY = Float.POSITIVE_INFINITY
+    )
+
     Box {
         // Background Image
         Image(
@@ -150,10 +169,14 @@ fun ContentComposable(
             contentDescription = "background_image",
             contentScale = ContentScale.FillBounds
         )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(gradient)
+        )
 
         // Scaffold with TopAppBar
         Scaffold(
-            modifier = modifier.fillMaxSize(),
             topBar = {
                 RecipeHomeTopAppBar(
                     onRefreshClick = onRefreshClick,
@@ -165,12 +188,12 @@ fun ContentComposable(
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(paddingValues)
             ) {
                 Text(
                     text = "Categories",
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(id = R.dimen.list_item_padding),
                         vertical = dimensionResource(id = R.dimen.vertical_margin)
@@ -183,7 +206,8 @@ fun ContentComposable(
 
                 RecipeListComposable(
                     recipeUiState = recipeUiState,
-                    onRecipeClick, categoryTitle)
+                    onRecipeClick = onRecipeClick,
+                    textTitle = categoryTitle)
 
             }
         }
@@ -204,7 +228,8 @@ fun RecipeListComposable(
                 horizontal = dimensionResource(id = R.dimen.list_item_padding),
                 vertical = dimensionResource(id = R.dimen.vertical_margin)
             ),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         // Show tray image if no recipes are available
@@ -255,7 +280,9 @@ fun RecipeCategoryComposable(
         )
     ) {
         items(categories.size) { category ->
-            CircularImageWithText(keyValue = categories[category], onCategoryClick = onCategoryClick )
+            CircularImageWithText(
+                keyValue = categories[category],
+                onCategoryClick = onCategoryClick )
         }
     }
 }
@@ -267,10 +294,14 @@ fun CircularImageWithText(
     onCategoryClick: (String) -> Unit
 ) {
     val (text, resId) = keyValue
-    Column(modifier = Modifier.padding(
-        horizontal = dimensionResource(id = R.dimen.list_item_padding),
-        vertical = dimensionResource(id = R.dimen.vertical_margin)
-    )
+    Column(
+        modifier = Modifier
+            .padding(
+                horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                vertical = dimensionResource(id = R.dimen.vertical_margin),
+
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter =painterResource(id =  resId),
@@ -279,10 +310,28 @@ fun CircularImageWithText(
             modifier = modifier
                 .size(64.dp)
                 .clip(CircleShape)
-                .border(1.dp, Color.Gray, CircleShape)
+                .border(1.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
                 .clickable {
                     onCategoryClick(text)
                 })
-        Text(text = text)
+        Text(text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface)
     }
 }
+@Preview
+@Composable
+private fun CircularImageWithTextPreview() {
+
+    MyRecipesTheme {
+        Surface {
+            CircularImageWithText(
+                    Pair("Vegetarian", R.drawable.veggies),
+                    Modifier,
+                    onCategoryClick = {}
+            )
+        }
+    }
+
+}
+
