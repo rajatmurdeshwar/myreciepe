@@ -22,6 +22,10 @@ object RecipeDestinations {
     const val RECIPE_DETAIL_ROUTE = "$RECIPE_DETAIL_SCREEN/{$RECIPE_ID_ARG}"
 }
 
+object RecipeHome {
+    const val RECIPE_HOME = "$RECIPES_SCREEN"
+}
+
 object RecipeSearch {
     const val RECIPE_SEARCH_ROUTE = "$RECIPE_SEARCH_SCREEN"
 }

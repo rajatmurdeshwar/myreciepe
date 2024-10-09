@@ -1,6 +1,5 @@
 package com.example.myrecipes.details
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 
 import androidx.compose.foundation.layout.Column
@@ -35,6 +34,7 @@ import com.example.myrecipes.R
 import com.example.myrecipes.util.RecipeDetailTopAppBar
 import com.example.myrecipes.data.source.Recipe
 import com.example.myrecipes.ui.theme.MyRecipesTheme
+import timber.log.Timber
 
 
 @Composable
@@ -45,7 +45,7 @@ fun RecipeDetailScreen(
     viewModel: RecipeDetailsViewModel = hiltViewModel()
 ) {
     MyRecipesTheme {
-        Log.d("RecipeDetailScreen", "recipe ID $recipeId")
+        Timber.d("RecipeDetailScreen", "recipe ID $recipeId")
         val recipe by viewModel.recipe.collectAsStateWithLifecycle()
 
         LaunchedEffect(recipeId) {
@@ -54,14 +54,14 @@ fun RecipeDetailScreen(
 
         recipe?.let {
             DetailComposable(modifier = modifier, onBack, recipe = it)
-            Log.d("RecipeDetailScreen", "Loaded recipe: $it")
+            Timber.d("RecipeDetailScreen", "Loaded recipe: $it")
         } ?: run {
-            Log.d("RecipeDetailScreen", "Loading recipe...")
+            Timber.d("RecipeDetailScreen", "Loading recipe...")
         }
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalGlideComposeApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun DetailComposable(
     modifier: Modifier = Modifier,
@@ -123,7 +123,6 @@ fun DetailComposable(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChipItem(text: String, onClick: () -> Unit = {}) {
     FilterChip(

@@ -11,12 +11,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.myrecipes.ui.theme.MyRecipesTheme
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("MainActivity","--------------")
+        Timber.d("MainActivity","--------------")
         setContent {
             MyRecipesTheme {
                 // A surface container using the 'background' color from the theme

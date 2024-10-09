@@ -60,7 +60,7 @@ class RecipeHomeViewModelTest {
     }
 
     @Test
-    fun testGetLocalRecipesWithError() = runBlocking {
+    fun testGetLocalRecipesWithError() = runTest {
 
         recipeRepository.setShouldThrowError(true)
         recipeViewModel.refreshList()
@@ -74,7 +74,7 @@ class RecipeHomeViewModelTest {
     @Test
     fun getOnlineRecipesWithTags_loadingTogglesAndDataLoaded() = runTest {
         // Given a tag to filter recipes
-        val tag = "tag1"
+        val tag = "Vegetarian"
 
         // When fetching online recipes with a specific tag
         recipeViewModel.getOnlineRecipesWithTags(tag)
@@ -92,8 +92,8 @@ class RecipeHomeViewModelTest {
         val filteredRecipes = recipeViewModel.recipeUiState.first().items
         assertThat(filteredRecipes).hasSize(2)
         assertThat(filteredRecipes).containsExactly(
-            Recipe(1, "Recipe 1", "", "tag1", "", "tag1", 0, 0, 0),
-            Recipe(3, "Recipe 3", "", "tag1,tag3", "", "tag1,tag3", 0, 0, 0)
+            Recipe(1, "Recipe 1", "", "Vegetarian", "", "Vegetarian", 0, 0, 0),
+            Recipe(3, "Recipe 3", "", "Vegetarian,Lunch", "", "Vegetarian,Lunch", 0, 0, 0)
         )
     }
 

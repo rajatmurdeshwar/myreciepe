@@ -1,6 +1,5 @@
 package com.example.myrecipes.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myrecipes.data.Repository
@@ -8,11 +7,13 @@ import com.example.myrecipes.data.source.Recipe
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 data class RecipeUiState(
@@ -43,7 +44,7 @@ class HomeViewModel @Inject constructor(
             if (list.isNullOrEmpty()){
                 getOnlineRecipes()
             } else {
-                //Log.d("HomeViewModel","getLocalRecipes "+list.size)
+                Timber.d("HomeViewModel","getLocalRecipes "+list.size)
                 _recipeUiState.update {
                     it.copy(
                         items = list,
@@ -90,7 +91,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(IO) {
             try {
                 val onlineRecipes = repository.getOnlineRecipesWithTags(tags)
-                Log.d("HomeViewModel", "online $tags")
+                Timber.d("HomeViewModel", "online $tags")
                 onlineRecipes?.let {list ->
                     _recipeUiState.update {
                         it.copy(

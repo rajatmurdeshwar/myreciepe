@@ -19,7 +19,7 @@ import com.example.myrecipes.search.RecipeSearchScreen
 fun RecipeNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = "recipes",
+    startDestination: String = RecipeHome.RECIPE_HOME,
     navActions: RecipeNavigationActions = remember(navController) {
         RecipeNavigationActions(navController)
     }
@@ -31,17 +31,18 @@ fun RecipeNavGraph(
         modifier = modifier
     ) {
 
-        composable("recipes") {
+        composable(
+            route = RecipeHome.RECIPE_HOME
+        ) {
             HomeScreen(
                 onRecipeClick = { recipeId -> recipeId.id?.let { it1 ->
                     navActions.navigateToRecipeDetail(
                         it1
                     )
-                } },
-                onSearchButtonClick = {
-                    navActions.navigateToSearchScreen()
-                }
-            )
+                } }
+            ) {
+                navActions.navigateToSearchScreen()
+            }
         }
 
         composable(

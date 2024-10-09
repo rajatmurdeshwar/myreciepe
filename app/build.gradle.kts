@@ -24,14 +24,34 @@ android {
             useSupportLibrary = true
         }
     }
+    flavorDimensions += "version"
+
+    productFlavors {
+        create("demo") {
+            dimension = "version"
+            applicationIdSuffix = ".demo"
+            versionNameSuffix = "-demo"
+        }
+        create("full") {
+            dimension = "version"
+            applicationIdSuffix = ".demo"
+            versionNameSuffix = "-demo"
+
+        }
+
+    }
 
     buildTypes {
+        debug {
+
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            isCrunchPngs = false
         }
     }
     compileOptions {
@@ -66,6 +86,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.glide)
     implementation(libs.jsoup)
+    implementation(libs.timber)
     implementation(libs.retrofit)
     implementation(libs.retrofit.covertor)
 

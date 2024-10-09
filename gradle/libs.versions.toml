@@ -21,6 +21,7 @@ glide = "1.0.0-beta01"
 retrofit = "2.9.0"
 jsoup="1.14.3"
 truth = "1.1.2"
+timber = "5.0.1"
 material3Android = "1.2.1"
 
 [libraries]
@@ -63,6 +64,7 @@ retrofit = {group = "com.squareup.retrofit2", name="retrofit", version.ref= "ret
 retrofit-covertor = {group = "com.squareup.retrofit2", name="converter-gson", version.ref= "retrofit" }
 jsoup = {group = "org.jsoup",name="jsoup", version.ref="jsoup"}
 androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

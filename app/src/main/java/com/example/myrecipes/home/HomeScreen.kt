@@ -1,7 +1,6 @@
 package com.example.myrecipes.home
 
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -54,27 +53,27 @@ import com.example.myrecipes.R
 import com.example.myrecipes.util.RecipeHomeTopAppBar
 import com.example.myrecipes.data.source.Recipe
 import com.example.myrecipes.ui.theme.MyRecipesTheme
+import timber.log.Timber
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     onRecipeClick: (Recipe) -> Unit,
     onSearchButtonClick: () -> Unit
 ) {
     val itemViewStates by viewModel.recipeUiState.collectAsStateWithLifecycle()
-    //Log.d("HomeScreen","ItemUI "+itemViewStates.items.size)
+
+    Timber.d("HomeScreen","ItemUI "+itemViewStates.items.size)
     ContentComposable(
-        modifier = modifier,
         recipeUiState = itemViewStates,
         onRecipeClick = onRecipeClick,
         onSearchButtonClick = onSearchButtonClick,
         onRefreshClick = {
             viewModel.refreshList()
-        },
-        onCategoryClick = {
-            viewModel.getOnlineRecipesWithTags(it)
-        })
+        }
+    ) {
+        viewModel.getOnlineRecipesWithTags(it)
+    }
 
 }
 
@@ -139,7 +138,6 @@ fun MyRecipeListItem(
 }
 @Composable
 fun ContentComposable(
-    modifier: Modifier = Modifier,
     recipeUiState: RecipeUiState,
     onRecipeClick: (Recipe) -> Unit,
     onSearchButtonClick: () -> Unit,
