@@ -147,7 +147,6 @@ fun EmbeddedSearchBar(
         tonalElevation = 0.dp,
         windowInsets = if (isSearchActive) {
             WindowInsets(0.dp)
-            //SearchBarDefaults.windowInsets
         } else {
             WindowInsets(0.dp)
         }

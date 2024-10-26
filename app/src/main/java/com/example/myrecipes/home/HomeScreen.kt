@@ -68,6 +68,9 @@ fun HomeScreen(
         recipeUiState = itemViewStates,
         onRecipeClick = onRecipeClick,
         onSearchButtonClick = onSearchButtonClick,
+        onSavedRecipeClick = {
+                             viewModel.savedRecipesList()
+        },
         onRefreshClick = {
             viewModel.refreshList()
         }
@@ -141,10 +144,11 @@ fun ContentComposable(
     recipeUiState: RecipeUiState,
     onRecipeClick: (Recipe) -> Unit,
     onSearchButtonClick: () -> Unit,
+    onSavedRecipeClick: () -> Unit,
     onRefreshClick: () -> Unit,
     onCategoryClick: (String) -> Unit
 ) {
-    var categoryTitle by remember { mutableStateOf("Saved") }
+    var categoryTitle by remember { mutableStateOf("Random") }
 
     val isDarkTheme = isSystemInDarkTheme()
     val gradientColors = if (isDarkTheme) {
@@ -177,6 +181,10 @@ fun ContentComposable(
         Scaffold(
             topBar = {
                 RecipeHomeTopAppBar(
+                    onSavedRecipes = {
+                    categoryTitle = "Saved"
+                    onSavedRecipeClick()
+                },
                     onRefreshClick = onRefreshClick,
                     onSearchButtonClick = onSearchButtonClick
                 )

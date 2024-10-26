@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myrecipes.data.Repository
 import com.example.myrecipes.data.source.Recipe
+import com.example.myrecipes.data.source.RecipeWithDetails
 import com.example.myrecipes.data.source.local.LocalRecipe
 import com.example.myrecipes.data.toExternal
 import com.example.myrecipes.data.toLocal
@@ -20,7 +21,7 @@ class RecipeDetailsViewModel@Inject constructor(
     private val repository: Repository,
 ) : ViewModel() {
 
-    private val _recipe : MutableStateFlow<Recipe?> = MutableStateFlow(null)
+    private val _recipe : MutableStateFlow<RecipeWithDetails?> = MutableStateFlow(null)
     val recipe = _recipe.asStateFlow()
 
     fun getRecipeByID(recipeId: Int) {

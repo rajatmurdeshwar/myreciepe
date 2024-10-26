@@ -14,5 +14,14 @@ data class LocalRecipe(
     val itemImage: String,
     val healthScore: Int,
     val readyIn: Int,
-    val servings: Int
+    val servings: Int,
+    val vegan: Boolean?,
+    val glutenFree: Boolean?,
+    val dairyFree: Boolean?
+)
+
+data class LocalRecipeWithDetails(
+    val recipe: LocalRecipe,
+    val ingredients: List<LocalIngredient>,
+    val steps: List<LocalStep>
 )

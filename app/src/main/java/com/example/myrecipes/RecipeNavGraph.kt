@@ -35,7 +35,7 @@ fun RecipeNavGraph(
             route = RecipeHome.RECIPE_HOME
         ) {
             HomeScreen(
-                onRecipeClick = { recipeId -> recipeId.id?.let { it1 ->
+                onRecipeClick = { recipeId -> recipeId.recipeId?.let { it1 ->
                     navActions.navigateToRecipeDetail(
                         it1
                     )

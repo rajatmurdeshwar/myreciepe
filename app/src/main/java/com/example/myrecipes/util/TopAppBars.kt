@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,8 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,11 +63,12 @@ fun RecipeDetailTopAppBar(titleName:String,onBack: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeHomeTopAppBar(onRefreshClick: () -> Unit, onSearchButtonClick: () -> Unit) {
+fun RecipeHomeTopAppBar(onSavedRecipes: () -> Unit, onRefreshClick: () -> Unit, onSearchButtonClick: () -> Unit) {
     TopAppBar(
         title = {
             Text(text = "RecipeMaker",
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -75,14 +77,21 @@ fun RecipeHomeTopAppBar(onRefreshClick: () -> Unit, onSearchButtonClick: () -> U
             actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         actions = {
-                         IconButton(onClick =  onRefreshClick ) {
-                             Icon(
-                                 imageVector = Icons.Filled.Refresh,
-                                 contentDescription = stringResource(id = R.string.menu_refresh),
-                                 tint = MaterialTheme.colorScheme.onPrimaryContainer
-                             )
+            IconButton(onClick = onSavedRecipes) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = stringResource(id = R.string.menu_saved),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer)
 
-                         }
+            }
+            IconButton(onClick =  onRefreshClick ) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = stringResource(id = R.string.menu_refresh),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+
+            }
             IconButton(onClick =
                 onSearchButtonClick
             ) {
@@ -93,8 +102,7 @@ fun RecipeHomeTopAppBar(onRefreshClick: () -> Unit, onSearchButtonClick: () -> U
                 )
 
             }
-        },
-        modifier = Modifier.fillMaxWidth(),
+        }
     )
 
 }
