@@ -1,8 +1,8 @@
 package com.example.myrecipes.util
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
@@ -21,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -56,8 +55,7 @@ fun RecipeDetailTopAppBar(titleName:String,onBack: () -> Unit) {
             containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.onPrimary,
             navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-    ),
-        modifier = Modifier
+    ),windowInsets = WindowInsets(0.dp)
     )
 }
 
@@ -102,7 +100,7 @@ fun RecipeHomeTopAppBar(onSavedRecipes: () -> Unit, onRefreshClick: () -> Unit, 
                 )
 
             }
-        }
+        },windowInsets = WindowInsets(0.dp)
     )
 
 }
@@ -124,10 +122,10 @@ fun RecipeSearchTopAppBar(
             .padding(16.dp)
     ) {
         SearchBar(
-            query = searchText,//text showed on SearchBar
-            onQueryChange = onSearchTextChange, //update the value of searchText
-            onSearch = onSearchTextChange, //the callback to be invoked when the input service triggers the ImeAction.Search action
-            active = isSearching, //whether the user is searching or not
+            query = searchText,
+            onQueryChange = onSearchTextChange,
+            onSearch = onSearchTextChange,
+            active = isSearching,
             onActiveChange = { onToogleSearch },
             modifier = Modifier
                 .fillMaxWidth()

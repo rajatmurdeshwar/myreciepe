@@ -73,7 +73,7 @@ fun HomeScreen(
         },
         onRefreshClick = {
             viewModel.refreshList()
-        }
+        },
     ) {
         viewModel.getOnlineRecipesWithTags(it)
     }

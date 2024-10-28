@@ -2,7 +2,6 @@ package com.example.myrecipes
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -17,7 +16,6 @@ import com.example.myrecipes.search.RecipeSearchScreen
 
 @Composable
 fun RecipeNavGraph(
-    modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     startDestination: String = RecipeHome.RECIPE_HOME,
     navActions: RecipeNavigationActions = remember(navController) {
@@ -27,8 +25,7 @@ fun RecipeNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = startDestination,
-        modifier = modifier
+        startDestination = startDestination
     ) {
 
         composable(
@@ -39,10 +36,11 @@ fun RecipeNavGraph(
                     navActions.navigateToRecipeDetail(
                         it1
                     )
-                } }
-            ) {
-                navActions.navigateToSearchScreen()
-            }
+                } },
+                onSearchButtonClick = {
+                    navActions.navigateToSearchScreen()
+                }
+            )
         }
 
         composable(
@@ -75,9 +73,6 @@ fun RecipeNavGraph(
                         navActions.navigateToRecipeDetail(
                             recipeId
                         )
-                },
-                onBack = {
-                    navController.popBackStack()
                 }
             )
         }
