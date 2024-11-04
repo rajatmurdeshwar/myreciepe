@@ -80,65 +80,6 @@ fun HomeScreen(
 
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-fun MyRecipeListItem(
-    itemOnline: Recipe,
-    onRecipeClick: (Recipe) -> Unit,
-    ) {
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = dimensionResource(id = R.dimen.horizontal_margin),
-                vertical = dimensionResource(id = R.dimen.list_item_padding),
-            )
-            .clickable { onRecipeClick(itemOnline) }
-            .fillMaxSize()
-    ) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-
-        ) {
-            val sizeImage by remember { mutableStateOf(IntSize.Zero) }
-
-            val gradient = Brush.verticalGradient(
-                colors = listOf(Color.Transparent.copy(alpha = 0.1f), Color.Black.copy(alpha = 0.5f)),
-                startY = sizeImage.height.toFloat()/3,  // 1/3
-                endY = sizeImage.height.toFloat()
-            )
-            Box(modifier = Modifier
-                .size(width = 240.dp, height = 100.dp)
-            ) {
-                GlideImage(
-                    model = itemOnline.itemImage,
-                    contentDescription = "",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    failure = placeholder(R.drawable.card_shape)
-                )
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(gradient))
-                Text(
-                    text = itemOnline.title,
-                    color = Color.White,
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    maxLines = 1,
-                    style = MaterialTheme.typography.bodySmall
-                )
-
-            }
-
-        }
-
-    }
-
-}
 @Composable
 fun ContentComposable(
     recipeUiState: RecipeUiState,
@@ -220,6 +161,7 @@ fun ContentComposable(
     }
 }
 
+
 @Composable
 fun RecipeListComposable(
     recipeUiState: RecipeUiState,
@@ -263,6 +205,66 @@ fun RecipeListComposable(
             }
         }
     }
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun MyRecipeListItem(
+    itemOnline: Recipe,
+    onRecipeClick: (Recipe) -> Unit,
+) {
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = dimensionResource(id = R.dimen.horizontal_margin),
+                vertical = dimensionResource(id = R.dimen.list_item_padding),
+            )
+            .clickable { onRecipeClick(itemOnline) }
+            .fillMaxSize()
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+
+        ) {
+            val sizeImage by remember { mutableStateOf(IntSize.Zero) }
+
+            val gradient = Brush.verticalGradient(
+                colors = listOf(Color.Transparent.copy(alpha = 0.1f), Color.Black.copy(alpha = 0.5f)),
+                startY = sizeImage.height.toFloat()/3,  // 1/3
+                endY = sizeImage.height.toFloat()
+            )
+            Box(modifier = Modifier
+                .size(width = 240.dp, height = 100.dp)
+            ) {
+                GlideImage(
+                    model = itemOnline.itemImage,
+                    contentDescription = "",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                    failure = placeholder(R.drawable.card_shape)
+                )
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .background(gradient))
+                Text(
+                    text = itemOnline.title,
+                    color = Color.White,
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    maxLines = 1,
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+            }
+
+        }
+
+    }
+
 }
 
 

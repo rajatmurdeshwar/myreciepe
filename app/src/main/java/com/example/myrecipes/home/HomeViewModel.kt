@@ -75,7 +75,7 @@ class HomeViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _recipeUiState.value = _recipeUiState.value.copy(
-                    userMessage = "Failed to fetch recipes: ${e.message}",
+                    userMessage = "Error loading recipes",
                     isLoading = false
                 )
             }
@@ -101,7 +101,7 @@ class HomeViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _recipeUiState.value = _recipeUiState.value.copy(
-                    userMessage = "Failed to fetch recipes: ${e.message}",
+                    userMessage = "Error loading recipes",
                     isLoading = false
                 )
             }
