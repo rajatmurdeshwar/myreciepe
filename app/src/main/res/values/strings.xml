@@ -7,4 +7,5 @@
     <string name="search_text_field_clear">Clear</string>
     <string name="navigation_action_back_cd">Back Button</string>
     <string name="menu_search">Search bar\n</string>
+    <string name="menu_saved">saved recipe</string>
 </resources>

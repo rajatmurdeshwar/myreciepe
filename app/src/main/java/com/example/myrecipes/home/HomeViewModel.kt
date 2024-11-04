@@ -31,7 +31,7 @@ class HomeViewModel @Inject constructor(
     val recipeUiState: StateFlow<RecipeUiState> = _recipeUiState
 
     init {
-        getLocalRecipes()
+        getOnlineRecipes()
     }
 
 
@@ -72,11 +72,10 @@ class HomeViewModel @Inject constructor(
                             isLoading = false
                         )
                     }
-                    updateRecipes(list)
                 }
             } catch (e: Exception) {
                 _recipeUiState.value = _recipeUiState.value.copy(
-                    userMessage = "Failed to fetch recipes: ${e.message}",
+                    userMessage = "Error loading recipes",
                     isLoading = false
                 )
             }
@@ -99,11 +98,10 @@ class HomeViewModel @Inject constructor(
                             isLoading = false
                         )
                     }
-                    //updateRecipes(list.recipes.toLocal())
                 }
             } catch (e: Exception) {
                 _recipeUiState.value = _recipeUiState.value.copy(
-                    userMessage = "Failed to fetch recipes: ${e.message}",
+                    userMessage = "Error loading recipes",
                     isLoading = false
                 )
             }
@@ -111,14 +109,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun updateRecipes(recipeList: List<Recipe?>) {
-        viewModelScope.launch(IO) {
-            val nonNullList = recipeList.filterNotNull()
-            repository.insertAllRecipes(nonNullList)
-        }
+    fun refreshList() {
+        getOnlineRecipes()
     }
 
-    fun refreshList() {
+    fun savedRecipesList() {
         getLocalRecipes()
     }
 

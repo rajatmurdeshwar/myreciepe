@@ -1,8 +1,8 @@
 package com.example.myrecipes.util
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,7 +22,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,18 +55,18 @@ fun RecipeDetailTopAppBar(titleName:String,onBack: () -> Unit) {
             containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.onPrimary,
             navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-    ),
-        modifier = Modifier
+    ),windowInsets = WindowInsets(0.dp)
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeHomeTopAppBar(onRefreshClick: () -> Unit, onSearchButtonClick: () -> Unit) {
+fun RecipeHomeTopAppBar(onSavedRecipes: () -> Unit, onRefreshClick: () -> Unit, onSearchButtonClick: () -> Unit) {
     TopAppBar(
         title = {
             Text(text = "RecipeMaker",
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -75,14 +75,21 @@ fun RecipeHomeTopAppBar(onRefreshClick: () -> Unit, onSearchButtonClick: () -> U
             actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         actions = {
-                         IconButton(onClick =  onRefreshClick ) {
-                             Icon(
-                                 imageVector = Icons.Filled.Refresh,
-                                 contentDescription = stringResource(id = R.string.menu_refresh),
-                                 tint = MaterialTheme.colorScheme.onPrimaryContainer
-                             )
+            IconButton(onClick = onSavedRecipes) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = stringResource(id = R.string.menu_saved),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer)
 
-                         }
+            }
+            IconButton(onClick =  onRefreshClick ) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = stringResource(id = R.string.menu_refresh),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+
+            }
             IconButton(onClick =
                 onSearchButtonClick
             ) {
@@ -93,8 +100,7 @@ fun RecipeHomeTopAppBar(onRefreshClick: () -> Unit, onSearchButtonClick: () -> U
                 )
 
             }
-        },
-        modifier = Modifier.fillMaxWidth(),
+        },windowInsets = WindowInsets(0.dp)
     )
 
 }
@@ -116,10 +122,10 @@ fun RecipeSearchTopAppBar(
             .padding(16.dp)
     ) {
         SearchBar(
-            query = searchText,//text showed on SearchBar
-            onQueryChange = onSearchTextChange, //update the value of searchText
-            onSearch = onSearchTextChange, //the callback to be invoked when the input service triggers the ImeAction.Search action
-            active = isSearching, //whether the user is searching or not
+            query = searchText,
+            onQueryChange = onSearchTextChange,
+            onSearch = onSearchTextChange,
+            active = isSearching,
             onActiveChange = { onToogleSearch },
             modifier = Modifier
                 .fillMaxWidth()

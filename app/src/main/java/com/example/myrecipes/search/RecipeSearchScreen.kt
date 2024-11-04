@@ -1,11 +1,7 @@
 package com.example.myrecipes.search
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
@@ -39,7 +35,7 @@ import com.example.myrecipes.ui.theme.MyRecipesTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
-    fun RecipeSearchScreen(viewModel: RecipeSearchViewModel = hiltViewModel(), onRecipeClick: (Int) -> Unit, onBack: () -> Unit) {
+    fun RecipeSearchScreen(viewModel: RecipeSearchViewModel = hiltViewModel(), onRecipeClick: (Int) -> Unit) {
 
         MyRecipesTheme {
             //Collecting states from ViewModel
@@ -70,7 +66,6 @@ fun EmbeddedSearchBar(
     onQueryChange: (String) -> Unit,
     isSearchActive: Boolean,
     onActiveChanged: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
     onSearch: ((String) -> Unit)? = null,
     recipeList: List<RecipeSearchData>,
     onRecipeClick: (Int) -> Unit
@@ -90,15 +85,6 @@ fun EmbeddedSearchBar(
         onSearch = onSearch ?: { activeChanged(false) },
         active = isSearchActive,
         onActiveChange = activeChanged,
-        modifier = if (isSearchActive) {
-            modifier
-                .animateContentSize(spring(stiffness = Spring.StiffnessHigh))
-        } else {
-            modifier
-                .padding(start = 12.dp, top = 2.dp, end = 12.dp, bottom = 12.dp)
-                .fillMaxWidth()
-                .animateContentSize(spring(stiffness = Spring.StiffnessHigh))
-        },
         placeholder = { Text("Search") },
         leadingIcon = {
             if (isSearchActive) {
@@ -145,12 +131,7 @@ fun EmbeddedSearchBar(
             },
         ),
         tonalElevation = 0.dp,
-        windowInsets = if (isSearchActive) {
-            WindowInsets(0.dp)
-            //SearchBarDefaults.windowInsets
-        } else {
-            WindowInsets(0.dp)
-        }
+        windowInsets = WindowInsets(0.dp)
     ) {
         LazyColumn {
             items(recipeList.size) { recipe ->

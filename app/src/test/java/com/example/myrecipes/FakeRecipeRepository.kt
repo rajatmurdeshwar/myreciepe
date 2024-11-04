@@ -3,6 +3,7 @@ package com.example.myrecipes
 import com.example.myrecipes.data.Repository
 import com.example.myrecipes.data.source.Recipe
 import com.example.myrecipes.data.source.RecipeSearchData
+import com.example.myrecipes.data.source.RecipeWithDetails
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,10 +17,10 @@ class FakeRecipeRepository: Repository {
 
     private var shouldThrowError = false
 
-    private val _savedRecipe = MutableStateFlow(LinkedHashMap<Int, Recipe>())
-    val savedRecipe: StateFlow<LinkedHashMap<Int, Recipe>> = _savedRecipe.asStateFlow()
+    private val _savedRecipe = MutableStateFlow(LinkedHashMap<Int, RecipeWithDetails>())
+    val savedRecipe: StateFlow<LinkedHashMap<Int, RecipeWithDetails>> = _savedRecipe.asStateFlow()
 
-    private val observableRecipes: Flow<List<Recipe>> = savedRecipe.map {
+    private val observableRecipes: Flow<List<RecipeWithDetails>> = savedRecipe.map {
         if (shouldThrowError) {
             throw Exception("Test exception")
         } else {
@@ -35,12 +36,14 @@ class FakeRecipeRepository: Repository {
         if (shouldThrowError) {
             throw Exception("Test exception")
         }
-        return observableRecipes.first()
+        return observableRecipes.first().map {
+            it.recipe
+        }
     }
 
-    override suspend fun getRecipeById(recipeId: Int): Flow<Recipe?> {
+    override suspend fun getRecipeById(recipeId: Int): Flow<RecipeWithDetails?> {
         return savedRecipe.map { recipes ->
-            recipes[recipeId]
+            recipes.get(recipeId)
         }
     }
 
@@ -48,23 +51,25 @@ class FakeRecipeRepository: Repository {
         if (shouldThrowError) {
             throw Exception("Test exception")
         }
-        return observableRecipes.first()
+        return observableRecipes.first().map {
+            it.recipe
+        }
     }
 
-    override suspend fun insertAllRecipes(recipe: List<Recipe>) {
+    override suspend fun insertAllRecipes(recipe: List<RecipeWithDetails>) {
         _savedRecipe.update { oldRecipe ->
             val newRecipe = LinkedHashMap(oldRecipe)
             for (recipee in recipe) {
-                newRecipe[recipee.id] = recipee
+                newRecipe[recipee.recipe.recipeId] = recipee
             }
             newRecipe
         }
     }
 
-    override suspend fun insertRecipe(recipe: Recipe) {
+    override suspend fun insertRecipe(recipe: RecipeWithDetails) {
         _savedRecipe.update { oldRecipes ->
             val newRecipes = LinkedHashMap(oldRecipes)
-            newRecipes[recipe.id] = recipe
+            newRecipes[recipe.recipe.recipeId] = recipe
             newRecipes
         }
     }
@@ -74,8 +79,8 @@ class FakeRecipeRepository: Repository {
             throw Exception("Test exception")
         }
         return observableRecipes.first()
-            .filter { it.title.contains(recipeName, ignoreCase = true) }
-            .map { RecipeSearchData(it.id, it.title, "","") }
+            .filter { it.recipe.title.contains(recipeName, ignoreCase = true) }
+            .map { RecipeSearchData(it.recipe.recipeId, it.recipe.title, "","") }
     }
 
     override suspend fun getOnlineRecipesWithTags(tags: String): List<Recipe?> {
@@ -83,10 +88,12 @@ class FakeRecipeRepository: Repository {
             throw Exception("Test exception")
         }
         return observableRecipes.first()
-            .filter { it.category.contains(tags) }
+            .filter { it.recipe.category.split(",").contains(tags) } // Adjust to split tags by comma
+            .map { it.recipe }
     }
 
-    override suspend fun getRecipeDetailsById(id: Int): Recipe? {
+
+    override suspend fun getRecipeDetailsById(id: Int): RecipeWithDetails? {
         if (shouldThrowError) {
             throw Exception("Test exception")
         }

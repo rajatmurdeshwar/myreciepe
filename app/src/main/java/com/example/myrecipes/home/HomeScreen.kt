@@ -68,13 +68,143 @@ fun HomeScreen(
         recipeUiState = itemViewStates,
         onRecipeClick = onRecipeClick,
         onSearchButtonClick = onSearchButtonClick,
+        onSavedRecipeClick = {
+                             viewModel.savedRecipesList()
+        },
         onRefreshClick = {
             viewModel.refreshList()
-        }
+        },
     ) {
         viewModel.getOnlineRecipesWithTags(it)
     }
 
+}
+
+@Composable
+fun ContentComposable(
+    recipeUiState: RecipeUiState,
+    onRecipeClick: (Recipe) -> Unit,
+    onSearchButtonClick: () -> Unit,
+    onSavedRecipeClick: () -> Unit,
+    onRefreshClick: () -> Unit,
+    onCategoryClick: (String) -> Unit
+) {
+    var categoryTitle by remember { mutableStateOf("Random") }
+
+    val isDarkTheme = isSystemInDarkTheme()
+    val gradientColors = if (isDarkTheme) {
+        listOf(Color.Transparent.copy(alpha = 0.1f), Color.Black.copy(alpha = 0.5f))
+    } else {
+        listOf(Color.Transparent.copy(alpha = 0.1f), Color.White.copy(alpha = 0.5f))
+    }
+
+    val gradient = Brush.verticalGradient(
+        colors = gradientColors,
+        startY = 0f,
+        endY = Float.POSITIVE_INFINITY
+    )
+
+    Box {
+        // Background Image
+        Image(
+            modifier = Modifier.fillMaxSize(),
+            painter = painterResource(id = R.drawable.home_background),
+            contentDescription = "background_image",
+            contentScale = ContentScale.FillBounds
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(gradient)
+        )
+
+        // Scaffold with TopAppBar
+        Scaffold(
+            topBar = {
+                RecipeHomeTopAppBar(
+                    onSavedRecipes = {
+                    categoryTitle = "Saved"
+                    onSavedRecipeClick()
+                },
+                    onRefreshClick = onRefreshClick,
+                    onSearchButtonClick = onSearchButtonClick
+                )
+            },
+            containerColor = Color.Transparent
+        ) { paddingValues ->
+
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+            ) {
+                Text(
+                    text = "Categories",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                        vertical = dimensionResource(id = R.dimen.vertical_margin)
+                    )
+                )
+                RecipeCategoryComposable(onCategoryClick = { category ->
+                    categoryTitle = category
+                    onCategoryClick(category)
+                })
+
+                RecipeListComposable(
+                    recipeUiState = recipeUiState,
+                    onRecipeClick = onRecipeClick,
+                    textTitle = categoryTitle)
+
+            }
+        }
+    }
+}
+
+
+@Composable
+fun RecipeListComposable(
+    recipeUiState: RecipeUiState,
+    onRecipeClick: (Recipe) -> Unit,
+    textTitle: String = "Saved"
+) {
+    Column {
+        // Saved Recipes Title
+        Text(
+            text = "$textTitle Recipes",
+            modifier = Modifier.padding(
+                horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                vertical = dimensionResource(id = R.dimen.vertical_margin)
+            ),
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        // Show tray image if no recipes are available
+        if (recipeUiState.items.isEmpty()) {
+            Image(
+                painter = painterResource(id = R.drawable.tray_on_hand),
+                contentDescription = stringResource(id = R.string.tray_on_hand)
+            )
+        }
+
+        // Show loading indicator if data is loading, otherwise show recipe list
+        if (recipeUiState.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        } else {
+            LazyVerticalGrid(GridCells.Fixed(2)) {
+                items(recipeUiState.items.size) { index ->
+                    val recipe = recipeUiState.items.getOrNull(index)
+                    recipe?.let {
+                        MyRecipeListItem(
+                            itemOnline = it,
+                            onRecipeClick = onRecipeClick
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -82,7 +212,7 @@ fun HomeScreen(
 fun MyRecipeListItem(
     itemOnline: Recipe,
     onRecipeClick: (Recipe) -> Unit,
-    ) {
+) {
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -135,126 +265,6 @@ fun MyRecipeListItem(
 
     }
 
-}
-@Composable
-fun ContentComposable(
-    recipeUiState: RecipeUiState,
-    onRecipeClick: (Recipe) -> Unit,
-    onSearchButtonClick: () -> Unit,
-    onRefreshClick: () -> Unit,
-    onCategoryClick: (String) -> Unit
-) {
-    var categoryTitle by remember { mutableStateOf("Saved") }
-
-    val isDarkTheme = isSystemInDarkTheme()
-    val gradientColors = if (isDarkTheme) {
-        listOf(Color.Transparent.copy(alpha = 0.1f), Color.Black.copy(alpha = 0.5f))
-    } else {
-        listOf(Color.Transparent.copy(alpha = 0.1f), Color.White.copy(alpha = 0.5f))
-    }
-
-    val gradient = Brush.verticalGradient(
-        colors = gradientColors,
-        startY = 0f,
-        endY = Float.POSITIVE_INFINITY
-    )
-
-    Box {
-        // Background Image
-        Image(
-            modifier = Modifier.fillMaxSize(),
-            painter = painterResource(id = R.drawable.home_background),
-            contentDescription = "background_image",
-            contentScale = ContentScale.FillBounds
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(gradient)
-        )
-
-        // Scaffold with TopAppBar
-        Scaffold(
-            topBar = {
-                RecipeHomeTopAppBar(
-                    onRefreshClick = onRefreshClick,
-                    onSearchButtonClick = onSearchButtonClick
-                )
-            },
-            containerColor = Color.Transparent
-        ) { paddingValues ->
-
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-            ) {
-                Text(
-                    text = "Categories",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(
-                        horizontal = dimensionResource(id = R.dimen.list_item_padding),
-                        vertical = dimensionResource(id = R.dimen.vertical_margin)
-                    )
-                )
-                RecipeCategoryComposable(onCategoryClick = { category ->
-                    categoryTitle = category
-                    onCategoryClick(category)
-                })
-
-                RecipeListComposable(
-                    recipeUiState = recipeUiState,
-                    onRecipeClick = onRecipeClick,
-                    textTitle = categoryTitle)
-
-            }
-        }
-    }
-}
-
-@Composable
-fun RecipeListComposable(
-    recipeUiState: RecipeUiState,
-    onRecipeClick: (Recipe) -> Unit,
-    textTitle: String = "Saved"
-) {
-    Column {
-        // Saved Recipes Title
-        Text(
-            text = "$textTitle Recipes",
-            modifier = Modifier.padding(
-                horizontal = dimensionResource(id = R.dimen.list_item_padding),
-                vertical = dimensionResource(id = R.dimen.vertical_margin)
-            ),
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        // Show tray image if no recipes are available
-        if (recipeUiState.items.isEmpty()) {
-            Image(
-                painter = painterResource(id = R.drawable.tray_on_hand),
-                contentDescription = stringResource(id = R.string.tray_on_hand)
-            )
-        }
-
-        // Show loading indicator if data is loading, otherwise show recipe list
-        if (recipeUiState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else {
-            LazyVerticalGrid(GridCells.Fixed(2)) {
-                items(recipeUiState.items.size) { index ->
-                    val recipe = recipeUiState.items.getOrNull(index)
-                    recipe?.let {
-                        MyRecipeListItem(
-                            itemOnline = it,
-                            onRecipeClick = onRecipeClick
-                        )
-                    }
-                }
-            }
-        }
-    }
 }
 
 

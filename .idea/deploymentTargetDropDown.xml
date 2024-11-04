@@ -2,13 +2,19 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="CircularImageWithTextPreview">
+      <entry key="RecipeHomeScreenTest">
         <State />
       </entry>
-      <entry key="RecipeDetailTopAppBarPreview">
+      <entry key="SearchBarSample">
         <State />
       </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="checkRepository()">
+        <State />
+      </entry>
+      <entry key="showVeganRecipes()">
         <State />
       </entry>
     </value>

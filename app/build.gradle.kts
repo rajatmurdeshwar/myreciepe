@@ -17,7 +17,9 @@ android {
         versionCode = 2
         versionName = "1.1"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        testInstrumentationRunner = "com.example.myrecipes.HiltTestRunner"
+
         buildConfigField("String", "RECIPE_BASE_URL", "\"https://api.spoonacular.com/\"")
         buildConfigField("String", "RECIPE_API_KEY", "\"70d62e58791441b2874bd5dc63393d10\"")
         vectorDrawables {
