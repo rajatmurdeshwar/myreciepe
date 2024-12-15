@@ -1,7 +1,11 @@
 package com.example.myrecipes.search
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
@@ -28,47 +32,64 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.myrecipes.R
 import com.example.myrecipes.data.source.RecipeSearchData
 import com.example.myrecipes.ui.theme.MyRecipesTheme
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-    @Composable
-    fun RecipeSearchScreen(viewModel: RecipeSearchViewModel = hiltViewModel(), onRecipeClick: (Int) -> Unit) {
+@Composable
+fun RecipeSearchScreen(navController: NavController,viewModel: RecipeSearchViewModel = hiltViewModel(), onRecipeClick: (Int) -> Unit) {
 
-        MyRecipesTheme {
-            //Collecting states from ViewModel
-            val searchText by viewModel.searchText.collectAsState()
-            val isSearching by viewModel.isSearching.collectAsState()
-            val recipeList by viewModel.searchList.collectAsState()
+    MyRecipesTheme {
+        //Collecting states from ViewModel
+        val searchText by viewModel.searchText.collectAsState()
+        val isSearching by viewModel.isSearching.collectAsState()
+        val recipeList by viewModel.searchList.collectAsState()
 
-            Scaffold(
-                topBar = {
-                    EmbeddedSearchBar(
-                        searchText = searchText,
-                        onQueryChange = viewModel::onSearchTextChange,
-                        isSearchActive = isSearching,
-                        onActiveChanged = { viewModel.onToogleSearch() },
-                        recipeList = recipeList,
-                        onRecipeClick = onRecipeClick
+        Column(modifier = Modifier.fillMaxSize()) {
+            EmbeddedSearchBar(
+                navController = navController,
+                searchText = searchText,
+                onQueryChange = viewModel::onSearchTextChange,
+                isSearchActive = isSearching,
+                onActiveChanged = { viewModel.onToggleSearch() }
+            )
+
+            LazyColumn {
+                items(recipeList.size) { recipe ->
+                    ClickableText(
+                        text = AnnotatedString(recipeList[recipe].title),
+                        onClick = {
+                            onRecipeClick(recipeList[recipe].id)
+                        },
+                        modifier = Modifier.padding(
+                            start = 8.dp,
+                            top = 4.dp,
+                            end = 8.dp,
+                            bottom = 4.dp
+                        ),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     )
                 }
-            ) {
             }
         }
     }
+}
+
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun EmbeddedSearchBar(
+    navController: NavController,
     searchText: String,
     onQueryChange: (String) -> Unit,
     isSearchActive: Boolean,
     onActiveChanged: (Boolean) -> Unit,
-    onSearch: ((String) -> Unit)? = null,
-    recipeList: List<RecipeSearchData>,
-    onRecipeClick: (Int) -> Unit
+    onSearch: ((String) -> Unit)? = null
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
     val activeChanged: (Boolean) -> Unit = { active ->
@@ -89,7 +110,10 @@ fun EmbeddedSearchBar(
         leadingIcon = {
             if (isSearchActive) {
                 IconButton(
-                    onClick = { activeChanged(false) },
+                    onClick = {
+                        activeChanged(false)
+                        navController.popBackStack()
+                              },
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
@@ -133,24 +157,6 @@ fun EmbeddedSearchBar(
         tonalElevation = 0.dp,
         windowInsets = WindowInsets(0.dp)
     ) {
-        LazyColumn {
-            items(recipeList.size) { recipe ->
-                ClickableText(
-                    text = AnnotatedString(recipeList[recipe].title),
-                    onClick = {
-                        onRecipeClick(recipeList[recipe].id)
-                    },
-                    modifier = Modifier.padding(
-                        start = 8.dp,
-                        top = 4.dp,
-                        end = 8.dp,
-                        bottom = 4.dp
-                    ),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                )
-            }
-        }
+
     }
 }

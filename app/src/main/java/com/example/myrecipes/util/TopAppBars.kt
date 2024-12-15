@@ -105,53 +105,6 @@ fun RecipeHomeTopAppBar(onSavedRecipes: () -> Unit, onRefreshClick: () -> Unit, 
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun RecipeSearchTopAppBar(
-    searchText: String,
-    isSearching: Boolean,
-    onToogleSearch: Boolean,
-    onSearchTextChange: (String) -> Unit,
-    recipeList: List<RecipeSearch>,
-    onRecipeClick: (Int) -> Unit,
-    onBack: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        SearchBar(
-            query = searchText,
-            onQueryChange = onSearchTextChange,
-            onSearch = onSearchTextChange,
-            active = isSearching,
-            onActiveChange = { onToogleSearch },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            LazyColumn {
-                items(recipeList.size) { recipe ->
-                    ClickableText(
-                        text = AnnotatedString(recipeList[recipe].title),
-                        onClick = {
-                            onRecipeClick(recipeList[recipe].id)
-                        },
-                        modifier = Modifier.padding(
-                            start = 8.dp,
-                            top = 4.dp,
-                            end = 8.dp,
-                            bottom = 4.dp
-                        )
-                    )
-                }
-            }
-        }
-
-    }
-}
-
 
 @Preview
 @Composable

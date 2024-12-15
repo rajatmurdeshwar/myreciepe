@@ -7,7 +7,6 @@ import com.example.myrecipes.data.source.Recipe
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -19,7 +18,8 @@ import javax.inject.Inject
 data class RecipeUiState(
     val items: List<Recipe?> = emptyList(),
     val isLoading: Boolean = false,
-    val userMessage: String? = null
+    val userMessage: String? = null,
+    val emptyItems: Boolean = false
 )
 
 @HiltViewModel
@@ -35,7 +35,7 @@ class HomeViewModel @Inject constructor(
     }
 
 
-    private fun getLocalRecipes() {
+/*    private fun getLocalRecipes() {
         _recipeUiState.update {
             it.copy(isLoading = true)
         }
@@ -56,7 +56,7 @@ class HomeViewModel @Inject constructor(
 
             }
         }
-    }
+    }*/
 
     private fun getOnlineRecipes() {
         _recipeUiState.update {
@@ -111,10 +111,6 @@ class HomeViewModel @Inject constructor(
 
     fun refreshList() {
         getOnlineRecipes()
-    }
-
-    fun savedRecipesList() {
-        getLocalRecipes()
     }
 
     override fun onCleared() {

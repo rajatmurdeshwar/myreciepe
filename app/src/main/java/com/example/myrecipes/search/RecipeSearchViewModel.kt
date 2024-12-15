@@ -26,7 +26,7 @@ class RecipeSearchViewModel@Inject constructor(
 ) : ViewModel() {
 
     //first state whether the search is happening or not
-    private val _isSearching = MutableStateFlow(false)
+    private val _isSearching = MutableStateFlow(true)
     val isSearching = _isSearching.asStateFlow()
 
     //second state the text typed by the user
@@ -42,7 +42,7 @@ class RecipeSearchViewModel@Inject constructor(
         getSearchQuery(text)
     }
 
-    fun onToogleSearch() {
+    fun onToggleSearch() {
         _isSearching.value = !_isSearching.value
         if (!_isSearching.value) {
             onSearchTextChange("")

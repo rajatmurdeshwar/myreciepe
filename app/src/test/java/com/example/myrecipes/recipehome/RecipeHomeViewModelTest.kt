@@ -64,7 +64,7 @@ class RecipeHomeViewModelTest {
 
         recipeViewModel.refreshList()
 
-            //assertThat(recipeViewModel.recipeUiState.first().isLoading).isTrue()
+        //assertThat(recipeViewModel.recipeUiState.first().isLoading).isTrue()
 
         advanceUntilIdle()
 

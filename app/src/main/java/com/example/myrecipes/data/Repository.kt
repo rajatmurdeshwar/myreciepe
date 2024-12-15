@@ -23,5 +23,7 @@ interface Repository {
     suspend fun getOnlineRecipesWithTags(tags: String): List<Recipe?>
 
     suspend fun getRecipeDetailsById(id: Int): RecipeWithDetails?
+
+    suspend fun addRecipesToDb(recipe: Recipe)
 }
 

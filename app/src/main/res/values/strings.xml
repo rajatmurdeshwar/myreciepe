@@ -8,4 +8,6 @@
     <string name="navigation_action_back_cd">Back Button</string>
     <string name="menu_search">Search bar\n</string>
     <string name="menu_saved">saved recipe</string>
+    <string name="categories_label">Categories</string>
+    <string name="home_background_description">background image</string>
 </resources>

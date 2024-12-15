@@ -1,4 +1,4 @@
-package com.example.myrecipes.Home
+package com.example.myrecipes.home
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -13,17 +13,13 @@ import com.example.myrecipes.HiltTestActivity
 import com.example.myrecipes.R
 import com.example.myrecipes.RecipeNavGraph
 import com.example.myrecipes.data.Repository
-import com.example.myrecipes.data.source.Recipe
-import com.example.myrecipes.data.source.RecipeWithDetails
 import com.example.myrecipes.ui.theme.MyRecipesTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.runner.RunWith
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
-import org.junit.Test
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)

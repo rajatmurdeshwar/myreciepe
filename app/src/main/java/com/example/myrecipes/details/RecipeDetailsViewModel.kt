@@ -42,9 +42,11 @@ class RecipeDetailsViewModel@Inject constructor(
             recipeDetail.let {
                 _recipe.emit(it)
                 if (it != null) {
+                    repository.addRecipesToDb(it.recipe)
                     repository.insertRecipe(it)
                 }
             }
         }
     }
+
 }

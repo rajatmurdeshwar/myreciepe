@@ -2,6 +2,7 @@ package com.example.myrecipes
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -9,15 +10,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.myrecipes.RecipeDestinationsArgs.RECIPE_ID_ARG
+import com.example.myrecipes.RecipeFavorite.RECIPE_FAV_ROUTE
+import com.example.myrecipes.RecipeHome.RECIPE_HOME_ROUTE
 import com.example.myrecipes.RecipeSearch.RECIPE_SEARCH_ROUTE
 import com.example.myrecipes.details.RecipeDetailScreen
+import com.example.myrecipes.favorite.RecipeFavoriteScreen
 import com.example.myrecipes.home.HomeScreen
 import com.example.myrecipes.search.RecipeSearchScreen
 
 @Composable
 fun RecipeNavGraph(
+    modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = RecipeHome.RECIPE_HOME,
+    startDestination: String = RECIPE_HOME_ROUTE,
     navActions: RecipeNavigationActions = remember(navController) {
         RecipeNavigationActions(navController)
     }
@@ -25,11 +30,12 @@ fun RecipeNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        modifier = modifier
     ) {
 
         composable(
-            route = RecipeHome.RECIPE_HOME
+            route = RECIPE_HOME_ROUTE
         ) {
             HomeScreen(
                 onRecipeClick = { recipeId -> recipeId.recipeId?.let { it1 ->
@@ -39,6 +45,9 @@ fun RecipeNavGraph(
                 } },
                 onSearchButtonClick = {
                     navActions.navigateToSearchScreen()
+                },
+                onBottomBarClick = {
+                    navActions.navigateToFavoriteScreen()
                 }
             )
         }
@@ -73,6 +82,21 @@ fun RecipeNavGraph(
                         navActions.navigateToRecipeDetail(
                             recipeId
                         )
+                },
+                navController = navController
+            )
+        }
+
+        composable(
+            route = RECIPE_FAV_ROUTE
+        ) {
+            RecipeFavoriteScreen(
+                onRecipeClick = { recipeId ->
+                    recipeId.recipeId?.let { it1 ->
+                        navActions.navigateToRecipeDetail(
+                            it1
+                        )
+                    }
                 }
             )
         }

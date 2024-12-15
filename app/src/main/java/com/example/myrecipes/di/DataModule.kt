@@ -10,16 +10,16 @@ import com.example.myrecipes.data.source.RepositoryImpl
 import com.example.myrecipes.data.source.local.AppDatabase
 import com.example.myrecipes.data.source.local.RecipeDao
 import com.example.myrecipes.data.source.network.NetworkDataSource
+import com.example.myrecipes.data.source.network.NewRecipeApiService
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 
@@ -31,6 +31,14 @@ abstract class RepositoryModule {
     @Binds
     abstract fun bindTaskRepository(repository: RepositoryImpl): Repository
 }
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class FoodApi
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class LocalApi
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -66,6 +74,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @FoodApi
     fun provideRecipeApi(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.RECIPE_BASE_URL)
@@ -76,8 +85,27 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideApi(retrofit: Retrofit): NetworkDataSource {
+    @LocalApi
+    fun provideNewRecipeRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("http://10.0.2.2:8080/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @FoodApi
+    fun provideApi(@FoodApi retrofit: Retrofit): NetworkDataSource {
         return retrofit.create(NetworkDataSource::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @LocalApi
+    fun provideLocalApi(@LocalApi retrofit: Retrofit): NewRecipeApiService {
+        return retrofit.create(NewRecipeApiService::class.java)
     }
 
 

@@ -4,22 +4,27 @@ import android.util.Log
 import com.example.myrecipes.data.Repository
 import com.example.myrecipes.data.source.local.RecipeDao
 import com.example.myrecipes.data.source.network.NetworkDataSource
+import com.example.myrecipes.data.source.network.NewRecipeApiService
 import com.example.myrecipes.data.tUioExternal
 import com.example.myrecipes.data.toExternal
 import com.example.myrecipes.data.toLocal
 import com.example.myrecipes.data.toRecipeSearchDataList
 import com.example.myrecipes.data.toUiExternal
 import com.example.myrecipes.data.toUiLocal
+import com.example.myrecipes.di.FoodApi
+import com.example.myrecipes.di.LocalApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class RepositoryImpl @Inject constructor(
     private val dao: RecipeDao,
-    private val networkData: NetworkDataSource
+    @FoodApi private val foodApi: NetworkDataSource,
+    @LocalApi private val localApi: NewRecipeApiService
 ) : Repository {
     override suspend fun getLocalRecipes(): List<Recipe> {
         return withContext(Dispatchers.IO) {
@@ -54,7 +59,7 @@ class RepositoryImpl @Inject constructor(
 
     override suspend fun getOnlineRecipes(): List<Recipe?> {
         return try {
-            networkData.getRecipes(5).recipes.toUiLocal()
+            foodApi.getRecipes(5).recipes.toUiLocal()
 
         } catch (e: Exception) {
             Log.e("RepositoryImpl","Exception "+e.message)
@@ -75,30 +80,44 @@ class RepositoryImpl @Inject constructor(
 
     override suspend fun searchRecipe(recipeName: String): List<RecipeSearchData?> {
         return try {
-            networkData.searchRecipe(recipeName).results.toRecipeSearchDataList()
+            foodApi.searchRecipe(recipeName).results.toRecipeSearchDataList()
 
         } catch (e: Exception) {
-            Log.e("RepositoryImpl","Exception "+e.message)
+            Timber.tag("RepositoryImpl").e("Exception %s", e.message)
             emptyList<RecipeSearchData>()
         }
     }
 
     override suspend fun getOnlineRecipesWithTags(tags: String): List<Recipe?> {
         return try {
-            networkData.getRecipesWithTags(10,tags).recipes.toUiLocal()
+            foodApi.getRecipesWithTags(10,tags).recipes.toUiLocal()
 
         } catch (e: Exception) {
-            Log.e("RepositoryImpl","Exception "+e.message)
+            Timber.tag("RepositoryImpl").e("Exception %s", e.message)
             emptyList<Recipe>()
         }
     }
 
     override suspend fun getRecipeDetailsById(id: Int): RecipeWithDetails? {
         return try {
-            networkData.getRecipeById(id).toLocal().toExternal()
+            foodApi.getRecipeById(id).toLocal().toExternal()
         } catch (e: Exception) {
-            Log.e("RepositoryImpl","Exception "+e.message)
+            Timber.tag("RepositoryImpl").e("Exception %s", e.message)
             null
         }
+    }
+
+    override suspend fun addRecipesToDb(recipe: Recipe) {
+        try {
+            val response = localApi.addRecipe(recipe)
+            if (response.isSuccessful) {
+                Timber.tag("RepositoryImpl").i("Recipe added successfully")
+            } else {
+                Timber.tag("RepositoryImpl").e("Failed to add recipe: ${response.errorBody()?.string()}")
+            }
+        } catch (e: Exception) {
+            Timber.tag("RepositoryImpl").e("Exception: ${e.message}")
+        }
+
     }
 }

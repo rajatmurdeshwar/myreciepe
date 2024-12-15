@@ -1,26 +1,40 @@
 package com.example.myrecipes.home
 
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,231 +54,177 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavDestination
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 
 import com.example.myrecipes.R
-import com.example.myrecipes.util.RecipeHomeTopAppBar
 import com.example.myrecipes.data.source.Recipe
 import com.example.myrecipes.ui.theme.MyRecipesTheme
-import timber.log.Timber
+import com.example.myrecipes.util.BottomNavigationItem
 
 @Composable
 fun HomeScreen(
+    modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     onRecipeClick: (Recipe) -> Unit,
-    onSearchButtonClick: () -> Unit
-) {
-    val itemViewStates by viewModel.recipeUiState.collectAsStateWithLifecycle()
-
-    Timber.d("HomeScreen","ItemUI "+itemViewStates.items.size)
-    ContentComposable(
-        recipeUiState = itemViewStates,
-        onRecipeClick = onRecipeClick,
-        onSearchButtonClick = onSearchButtonClick,
-        onSavedRecipeClick = {
-                             viewModel.savedRecipesList()
-        },
-        onRefreshClick = {
-            viewModel.refreshList()
-        },
-    ) {
-        viewModel.getOnlineRecipesWithTags(it)
-    }
-
-}
-
-@Composable
-fun ContentComposable(
-    recipeUiState: RecipeUiState,
-    onRecipeClick: (Recipe) -> Unit,
     onSearchButtonClick: () -> Unit,
-    onSavedRecipeClick: () -> Unit,
-    onRefreshClick: () -> Unit,
-    onCategoryClick: (String) -> Unit
+    onBottomBarClick: (String) -> Unit
 ) {
+    val recipeUiState by viewModel.recipeUiState.collectAsStateWithLifecycle()
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
     var categoryTitle by remember { mutableStateOf("Random") }
 
-    val isDarkTheme = isSystemInDarkTheme()
-    val gradientColors = if (isDarkTheme) {
-        listOf(Color.Transparent.copy(alpha = 0.1f), Color.Black.copy(alpha = 0.5f))
-    } else {
-        listOf(Color.Transparent.copy(alpha = 0.1f), Color.White.copy(alpha = 0.5f))
-    }
-
-    val gradient = Brush.verticalGradient(
-        colors = gradientColors,
-        startY = 0f,
-        endY = Float.POSITIVE_INFINITY
-    )
 
     Box {
         // Background Image
         Image(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             painter = painterResource(id = R.drawable.home_background),
             contentDescription = "background_image",
             contentScale = ContentScale.FillBounds
         )
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
-                .background(gradient)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent.copy(alpha = 0.1f),
+                            if (isSystemInDarkTheme()) Color.Black.copy(alpha = 0.5f)
+                            else Color.White.copy(alpha = 0.5f)
+                        )
+                    )
+                )
         )
 
-        // Scaffold with TopAppBar
-        Scaffold(
-            topBar = {
-                RecipeHomeTopAppBar(
-                    onSavedRecipes = {
-                    categoryTitle = "Saved"
-                    onSavedRecipeClick()
-                },
-                    onRefreshClick = onRefreshClick,
-                    onSearchButtonClick = onSearchButtonClick
+        // Scaffold with bottomBar
+        Scaffold (
+            modifier = modifier.fillMaxSize(),
+            bottomBar = {
+                HomeBottomAppBar(
+                    currentDestination = currentDestination,
+                    onClickBottomBar = onBottomBarClick
                 )
             },
             containerColor = Color.Transparent
         ) { paddingValues ->
 
-            Column(
-                modifier = Modifier
+            LazyColumn(
+                modifier = modifier
                     .padding(paddingValues)
             ) {
-                Text(
-                    text = "Categories",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(
-                        horizontal = dimensionResource(id = R.dimen.list_item_padding),
-                        vertical = dimensionResource(id = R.dimen.vertical_margin)
+                item {
+                    SearchBarButton (
+                        onSearchIconClick = onSearchButtonClick
                     )
-                )
-                RecipeCategoryComposable(onCategoryClick = { category ->
-                    categoryTitle = category
-                    onCategoryClick(category)
-                })
-
-                RecipeListComposable(
-                    recipeUiState = recipeUiState,
-                    onRecipeClick = onRecipeClick,
-                    textTitle = categoryTitle)
-
-            }
-        }
-    }
-}
-
-
-@Composable
-fun RecipeListComposable(
-    recipeUiState: RecipeUiState,
-    onRecipeClick: (Recipe) -> Unit,
-    textTitle: String = "Saved"
-) {
-    Column {
-        // Saved Recipes Title
-        Text(
-            text = "$textTitle Recipes",
-            modifier = Modifier.padding(
-                horizontal = dimensionResource(id = R.dimen.list_item_padding),
-                vertical = dimensionResource(id = R.dimen.vertical_margin)
-            ),
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        // Show tray image if no recipes are available
-        if (recipeUiState.items.isEmpty()) {
-            Image(
-                painter = painterResource(id = R.drawable.tray_on_hand),
-                contentDescription = stringResource(id = R.string.tray_on_hand)
-            )
-        }
-
-        // Show loading indicator if data is loading, otherwise show recipe list
-        if (recipeUiState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else {
-            LazyVerticalGrid(GridCells.Fixed(2)) {
-                items(recipeUiState.items.size) { index ->
-                    val recipe = recipeUiState.items.getOrNull(index)
-                    recipe?.let {
-                        MyRecipeListItem(
-                            itemOnline = it,
-                            onRecipeClick = onRecipeClick
+                }
+                item {
+                    Text(
+                        text = "Categories",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(
+                            horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                            vertical = dimensionResource(id = R.dimen.vertical_margin)
                         )
-                    }
+                    )
+                    RecipeCategoryComposable(onCategoryClick = { category ->
+                        categoryTitle = category
+                        viewModel.getOnlineRecipesWithTags(category)
+                    })
+                }
+                item {
+                    FeaturedBanner(recipeUiState = recipeUiState, onRecipeClick = onRecipeClick)
+                }
+                item {
+                    SeasonalBanner(recipeUiState = recipeUiState, onRecipeClick = onRecipeClick)
                 }
             }
         }
     }
+
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun MyRecipeListItem(
-    itemOnline: Recipe,
-    onRecipeClick: (Recipe) -> Unit,
-) {
+fun HomeBottomAppBar(
+    currentDestination: NavDestination?,
+    onClickBottomBar: (String) -> Unit) {
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = dimensionResource(id = R.dimen.horizontal_margin),
-                vertical = dimensionResource(id = R.dimen.list_item_padding),
+    NavigationBar {
+        BottomNavigationItem().bottomNavigationItems().forEachIndexed { _, navigationItem ->
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = navigationItem.icon,
+                        contentDescription = navigationItem.label,
+                        modifier = Modifier.size(32.dp),
+                    )
+                },
+                label = { Text(navigationItem.label) },
+                selected = navigationItem.route == currentDestination?.route,
+                onClick = {
+                    if (navigationItem.route != currentDestination?.route) {
+                        onClickBottomBar (navigationItem.route)
+
+                    }
+                }
             )
-            .clickable { onRecipeClick(itemOnline) }
-            .fillMaxSize()
-    ) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-
-        ) {
-            val sizeImage by remember { mutableStateOf(IntSize.Zero) }
-
-            val gradient = Brush.verticalGradient(
-                colors = listOf(Color.Transparent.copy(alpha = 0.1f), Color.Black.copy(alpha = 0.5f)),
-                startY = sizeImage.height.toFloat()/3,  // 1/3
-                endY = sizeImage.height.toFloat()
-            )
-            Box(modifier = Modifier
-                .size(width = 240.dp, height = 100.dp)
-            ) {
-                GlideImage(
-                    model = itemOnline.itemImage,
-                    contentDescription = "",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    failure = placeholder(R.drawable.card_shape)
-                )
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(gradient))
-                Text(
-                    text = itemOnline.title,
-                    color = Color.White,
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    maxLines = 1,
-                    style = MaterialTheme.typography.bodySmall
-                )
-
-            }
-
         }
 
     }
+}
 
+@Composable
+fun SearchBarButton(
+    modifier: Modifier = Modifier,
+    placeHolderText: String = "Search recipes or ingredients....",
+    onSearchIconClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable(
+                interactionSource = remember {
+                    MutableInteractionSource()
+                },
+                indication = rememberRipple(
+                    bounded = true,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                onClick = { onSearchIconClick() }
+            )
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = placeHolderText,
+            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+            modifier = Modifier.weight(1f)
+        )
+
+        IconButton(onClick = { onSearchIconClick() }) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Tap to search recipes or ingredients",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
 }
 
 
@@ -312,7 +272,7 @@ fun CircularImageWithText(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter =painterResource(id =  resId),
+            painter = painterResource(id =  resId),
             contentDescription = "Image",
             contentScale = ContentScale.Crop,
             modifier = modifier
@@ -326,6 +286,145 @@ fun CircularImageWithText(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface)
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
+@Composable
+fun FeaturedBanner(
+    recipeUiState: RecipeUiState,
+    onRecipeClick: (Recipe) -> Unit,
+) {
+
+    // State for managing the pager
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { recipeUiState.items.size} // Total number of pages
+    )
+
+    Column {
+        // Title for the banner
+        Text(
+            text = "Recipe of the Day",
+            modifier = Modifier.padding(
+                horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                vertical = dimensionResource(id = R.dimen.vertical_margin)
+            ),
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        if (recipeUiState.items.isEmpty()) {
+            Image(
+                painter = painterResource(id = R.drawable.tray_on_hand),
+                contentDescription = stringResource(id = R.string.tray_on_hand)
+            )
+        }
+        if (recipeUiState.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        } else {
+
+            // Horizontal Pager for scrolling through cards
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp) // Set the height for the pager
+            ) { page ->
+                val recipe = recipeUiState.items[page]
+                val recipeImage = recipeUiState.items[page]?.itemImage
+                // Each page is an image card
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    ),
+                    modifier = Modifier
+                        .padding(8.dp) // Add spacing between cards
+                        .fillMaxSize(), // Fill the available space
+                    onClick = {
+                        recipe?.let { onRecipeClick(it) }
+                    }
+                ) {
+                    GlideImage(
+                        model = recipeImage,
+                        contentDescription = "Recipe Image for Page $recipeImage",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        failure = placeholder(R.drawable.card_shape)
+                    )
+
+                }
+            }
+        }
+
+    }
+}
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun SeasonalBanner(
+    recipeUiState: RecipeUiState,
+    onRecipeClick: (Recipe) -> Unit,
+){
+    Column {
+        // Title for the banner
+        Text(
+            text = "Holiday Special",
+            modifier = Modifier.padding(
+                horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                vertical = dimensionResource(id = R.dimen.vertical_margin)
+            ),
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        if (recipeUiState.items.isEmpty()) {
+            Image(
+                painter = painterResource(id = R.drawable.tray_on_hand),
+                contentDescription = stringResource(id = R.string.tray_on_hand)
+            )
+        }
+        if (recipeUiState.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        } else {
+            LazyVerticalGrid(
+                GridCells.Fixed(2),
+                modifier = Modifier.height(500.dp)
+            ) {
+                items(recipeUiState.items.size) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        ),
+                        modifier = Modifier
+                            .padding(8.dp) // Add spacing between cards
+                            .fillMaxSize(), // Fill the available space
+                        onClick = {
+                            recipeUiState.items[it]?.let { it1 -> onRecipeClick(it1) }
+                        }
+                    ) {
+
+                        Column {
+                            GlideImage(
+                                model = recipeUiState.items[it]?.itemImage,
+                                contentDescription = "Recipe Image for Page ",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                                failure = placeholder(R.drawable.card_shape)
+                            )
+                            recipeUiState.items[it]?.let { it1 ->
+                                Text(
+                                    text = it1.title,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(4.dp),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+
+                    }
+                }
+
+            }
+        }
+    }
+
 }
 @Preview
 @Composable
