@@ -10,4 +10,5 @@
     <string name="menu_saved">saved recipe</string>
     <string name="categories_label">Categories</string>
     <string name="home_background_description">background image</string>
+    <string name="no_recipes_found">No Recipes found!</string>
 </resources>

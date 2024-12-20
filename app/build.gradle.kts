@@ -7,18 +7,18 @@ plugins {
 }
 
 android {
-    namespace = "com.example.myrecipes"
+    namespace = "com.murdeshwar.myrecipe"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.murdeshwar.myrecipes"
+        applicationId = "com.murdeshwar.myrecipe"
         minSdk = 24
         targetSdk = 34
         versionCode = 2
         versionName = "1.1"
 
 
-        testInstrumentationRunner = "com.example.myrecipes.HiltTestRunner"
+        testInstrumentationRunner = "com.murdeshwar.myrecipe.HiltTestRunner"
 
         buildConfigField("String", "RECIPE_BASE_URL", "\"https://api.spoonacular.com/\"")
         buildConfigField("String", "RECIPE_API_KEY", "\"70d62e58791441b2874bd5dc63393d10\"")
