@@ -36,7 +36,9 @@ class FavoriteViewModel @Inject constructor(
                 if (list.isNullOrEmpty()){
                     _recipeUiState.update {
                         it.copy(
-                            emptyItems = true
+                            emptyItems = true,
+                            isLoading = false
+
                         )
                     }
                 } else {

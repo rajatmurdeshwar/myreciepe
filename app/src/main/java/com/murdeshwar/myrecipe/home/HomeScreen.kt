@@ -1,6 +1,7 @@
 package com.murdeshwar.myrecipe.home
 
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,9 +9,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +54,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -262,9 +266,13 @@ fun FeaturedBanner(
             )
         }
         if (recipeUiState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         } else {
-
             // Horizontal Pager for scrolling through cards
             HorizontalPager(
                 state = pagerState,
@@ -273,7 +281,7 @@ fun FeaturedBanner(
                     .height(250.dp) // Set the height for the pager
             ) { page ->
                 val recipe = recipeUiState.items[page]
-                val recipeImage = recipeUiState.items[page]?.itemImage
+                val recipeImage = recipe?.itemImage ?: R.drawable.card_shape
                 // Each page is an image card
                 Card(
                     colors = CardDefaults.cardColors(
@@ -288,18 +296,53 @@ fun FeaturedBanner(
                 ) {
                     GlideImage(
                         model = recipeImage,
-                        contentDescription = "Recipe Image for Page $recipeImage",
+                        contentDescription = "Recipe Image for Page $page",
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                        failure = placeholder(R.drawable.card_shape)
-                    )
+                        contentScale = ContentScale.Crop
+
+                    ) {
+                        it.error{ placeholder(R.drawable.card_shape) }
+                    }
 
                 }
             }
-        }
+            Spacer(modifier = Modifier.height(8.dp))
 
+            DotsIndicator(
+                totalDots = recipeUiState.items.size,
+                selectedIndex = pagerState.currentPage
+            )
+        }
     }
 }
+
+@Composable
+fun DotsIndicator(
+    totalDots: Int,
+    selectedIndex: Int,
+    dotSize: Dp = 8.dp,
+    dotSpacing: Dp = 8.dp,
+    selectedColor: Color = Color.Green,
+    unselectedColor: Color = Color.Gray
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        for (i in 0 until totalDots) {
+            val color by animateColorAsState(
+                targetValue = if (i == selectedIndex) selectedColor else unselectedColor, label = ""
+            )
+            Box(
+                modifier = Modifier
+                    .size(dotSize)
+                    .padding(horizontal = dotSpacing / 2)
+                    .background(color, CircleShape)
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun SeasonalBanner(

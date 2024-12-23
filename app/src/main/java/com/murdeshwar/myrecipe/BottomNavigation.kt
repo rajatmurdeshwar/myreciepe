@@ -12,14 +12,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.murdeshwar.myrecipe.details.RecipeDetailScreen
 import com.murdeshwar.myrecipe.favorite.RecipeFavoriteScreen
 import com.murdeshwar.myrecipe.home.HomeScreen
 import com.murdeshwar.myrecipe.profile.RecipeProfileScreen
-import com.murdeshwar.myrecipe.search.SearchBarScreen
+import com.murdeshwar.myrecipe.search.RecipeSearchScreen
 import com.murdeshwar.myrecipe.util.BottomNavigationItem
 
 @Composable
@@ -88,8 +91,11 @@ fun BottomNavigation(navController: NavController) {
 
             ) {
 
-                SearchBarScreen(
-                )
+                RecipeSearchScreen(onRecipeClick = { recipeId ->
+                    navActions.navigateToRecipeDetail(
+                        recipeId
+                    )
+                })
             }
             composable(
                 route = RecipeProfile.RECIPE_PROFILE_ROUTE
@@ -111,6 +117,26 @@ fun BottomNavigation(navController: NavController) {
                         }
                     }
                 )
+            }
+
+            composable(
+                route = RecipeDestinations.RECIPE_DETAIL_ROUTE,
+                arguments = listOf(
+                    navArgument(RecipeDestinationsArgs.RECIPE_ID_ARG) {
+                        type = NavType.IntType
+                        defaultValue = 0
+                    }
+                )
+            ) { navBackStackEntry ->
+                val recipeId = navBackStackEntry.arguments?.getInt(RecipeDestinationsArgs.RECIPE_ID_ARG)
+                recipeId?.let {
+                    RecipeDetailScreen(
+                        recipeId = it,
+                        onBack = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
             }
         }
     }

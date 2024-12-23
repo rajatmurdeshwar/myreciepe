@@ -10,11 +10,11 @@ import retrofit2.http.POST
 
 interface NewRecipeApiService {
 
-    @POST("api/signup")
+    @POST("auth/signup")
     suspend fun signup(@Body userData: User): Response<Void>
 
-    @POST("api/login")
-    suspend fun login(@Body login: LoginUser) : Response<Void>
+    @POST("auth/login")
+    suspend fun login(@Body login: LoginUser) : Response<LoginResponse>
 
     @POST("api/")
     suspend fun addRecipe(@Body recipe: Recipe): Response<Void>

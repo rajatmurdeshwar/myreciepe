@@ -59,6 +59,7 @@ fun LoginScreen(
         when (uiState) {
             is UserViewModel.UIEvent.Success -> {
                 snackbarHostState.showSnackbar((uiState as UserViewModel.UIEvent.Success).message)
+                userViewModel.saveLoginState(true)
                 userViewModel.resetUIState() // Reset state
                 if (isLoginScreen) onLoginSuccess() else onSignUpSuccess() // Trigger navigation
             }
@@ -95,7 +96,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .padding(bottom = 50.dp)
                     .wrapContentSize(Alignment.Center),
-                text = "EzeTap",
+                text = "Recipe Maker",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 30.sp

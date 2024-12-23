@@ -61,7 +61,9 @@ fun RecipeDetailScreen(
         }
 
         recipe?.let {
-            DetailComposable(modifier = modifier, onBack, recipe = it)
+            DetailComposable(modifier = modifier, onBack, recipe = it, onSave = {
+                viewModel.saveRecipeToRemoteAndLocal(recipe!!)
+            })
             Timber.d("RecipeDetailScreen", "Loaded recipe: $it")
         } ?: run {
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -77,11 +79,12 @@ fun RecipeDetailScreen(
 fun DetailComposable(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
+    onSave: () -> Unit,
     recipe: RecipeWithDetails,
 ) {
     Scaffold(
         topBar = {
-            RecipeDetailTopAppBar(recipe.recipe.title, onBack = onBack)
+            RecipeDetailTopAppBar(recipe.recipe.title, onBack = onBack, onSaveRecipeClick = onSave)
         },
         content = { paddingValues ->
             Column(
@@ -110,6 +113,23 @@ fun DetailComposable(
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp)
                 )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Chip items (servings, health score, ready time)
+                FlowRow(modifier = Modifier.padding(6.dp)) {
+                    ChipItem("Servings: ${recipe.recipe.servings}")
+                    ChipItem("Health Score: ${recipe.recipe.healthScore}")
+                    ChipItem("Ready In: ${recipe.recipe.readyIn} mins")
+                    if (recipe.recipe.vegan == true) {
+                        ChipItem("Vegan")
+                    }
+                    if (recipe.recipe.glutenFree == true) {
+                        ChipItem("Gluten Free")
+                    }
+                    if (recipe.recipe.dairyFree == true) {
+                        ChipItem("Dairy Free")
+                    }
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Text(
@@ -147,23 +167,6 @@ fun DetailComposable(
                 }
 
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Chip items (servings, health score, ready time)
-                FlowRow(modifier = Modifier.padding(6.dp)) {
-                    ChipItem("Servings: ${recipe.recipe.servings}")
-                    ChipItem("Health Score: ${recipe.recipe.healthScore}")
-                    ChipItem("Ready In: ${recipe.recipe.readyIn} mins")
-                    if (recipe.recipe.vegan == true) {
-                        ChipItem("Vegan")
-                    }
-                    if (recipe.recipe.glutenFree == true) {
-                        ChipItem("Gluten Free")
-                    }
-                    if (recipe.recipe.dairyFree == true) {
-                        ChipItem("Dairy Free")
-                    }
-                }
                 Spacer(modifier = Modifier.height(16.dp))
                 // Summary Section
                 Text(

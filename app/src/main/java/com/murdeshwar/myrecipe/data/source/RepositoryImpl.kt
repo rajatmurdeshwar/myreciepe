@@ -2,6 +2,7 @@ package com.murdeshwar.myrecipe.data.source
 
 import com.murdeshwar.myrecipe.data.Repository
 import com.murdeshwar.myrecipe.data.source.local.RecipeDao
+import com.murdeshwar.myrecipe.data.source.network.LoginResponse
 import com.murdeshwar.myrecipe.data.source.network.NetworkDataSource
 import com.murdeshwar.myrecipe.data.source.network.NewRecipeApiService
 import com.murdeshwar.myrecipe.data.tUioExternal
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -122,20 +124,29 @@ class RepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun loginUser(user: LoginUser) {
-        try {
+    override suspend fun loginUser(user: LoginUser): String {
+        return try {
             val response = localApi.login(user)
             if (response.isSuccessful) {
-                Timber.tag("RepositoryImpl").i("Login successful")
-                // Handle login success, e.g., save user session data if needed.
+                val loginResponse = response.body()
+                if (loginResponse != null) {
+                    Timber.tag("RepositoryImpl").i("Login successful: ${loginResponse.token}")
+                    loginResponse.token // Return the token
+                } else {
+                    Timber.tag("RepositoryImpl").e("Empty response body")
+                    throw Exception("Login failed: Empty response body")
+                }
             } else {
                 val error = response.errorBody()?.string() ?: "Unknown error"
                 Timber.tag("RepositoryImpl").e("Login failed: $error")
+                throw Exception("Login failed: $error")
             }
         } catch (e: Exception) {
             Timber.tag("RepositoryImpl").e("Exception occurred during login: ${e.message}")
+            throw e
         }
     }
+
 
     override suspend fun signupUser(user: User) {
         try {

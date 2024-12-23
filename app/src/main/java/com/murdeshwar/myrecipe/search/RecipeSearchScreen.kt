@@ -1,13 +1,16 @@
 package com.murdeshwar.myrecipe.search
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,54 +23,69 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.murdeshwar.myrecipe.R
+import com.murdeshwar.myrecipe.data.source.RecipeSearchData
+import com.murdeshwar.myrecipe.ui.theme.MyRecipesTheme
 
 @Composable
-fun SearchBarScreen() {
-    var searchText by remember { mutableStateOf("") }
-    var isSearchActive by remember { mutableStateOf(false) }
-    val allRecipes = listOf(
-        "Spaghetti Bolognese",
-        "Chicken Alfredo",
-        "Vegan Buddha Bowl",
-        "Beef Stroganoff",
-        "Caesar Salad",
-        "Margherita Pizza",
-        "Tacos",
-        "Ramen Noodles",
-        "Pancakes",
-        "Grilled Cheese Sandwich"
-    )
+fun RecipeSearchScreen(viewModel: RecipeSearchViewModel = hiltViewModel(), onRecipeClick: (Int) -> Unit) {
 
-    val filteredRecipes = allRecipes.filter { it.contains(searchText, ignoreCase = true) }
+    MyRecipesTheme {
+        //Collecting states from ViewModel
+        val searchText by viewModel.searchText.collectAsState()
+        val isSearching by viewModel.isSearching.collectAsState()
+        val recipeList by viewModel.searchList.collectAsState()
 
-    Scaffold(
-        topBar = {
-            SimpleSearchBar(
-                searchText = searchText,
-                onQueryChange = { searchText = it },
-                isSearchActive = isSearchActive,
-                onActiveChanged = { isSearchActive = it }
-            )
-        }
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            items(filteredRecipes) { recipe ->
-                Text(
-                    text = recipe,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    style = MaterialTheme.typography.bodyMedium
+        Scaffold(
+            topBar = {
+                EmbeddedSearchBar(
+                    searchText = searchText,
+                    onQueryChange = viewModel::onSearchTextChange,
+                    isSearchActive = isSearching,
+                    onActiveChanged = { viewModel.onToggleSearch() },
+                    recipeList = recipeList,
+                    onRecipeClick = onRecipeClick
                 )
+            }
+        ) { paddingValues ->
+            if (recipeList.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No recipes found.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                LazyColumn(modifier = Modifier.padding(paddingValues)) {
+                    items(recipeList.size) { recipe ->
+                        Text(
+                            text = recipeList[recipe].title,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .clickable { onRecipeClick(recipeList[recipe].id) },
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
             }
         }
     }
@@ -75,40 +93,62 @@ fun SearchBarScreen() {
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun SimpleSearchBar(
+fun EmbeddedSearchBar(
     searchText: String,
     onQueryChange: (String) -> Unit,
     isSearchActive: Boolean,
-    onActiveChanged: (Boolean) -> Unit
+    onActiveChanged: (Boolean) -> Unit,
+    onSearch: ((String) -> Unit)? = null,
+    recipeList: List<RecipeSearchData>,
+    onRecipeClick: (Int) -> Unit
 ) {
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    val activeChanged: (Boolean) -> Unit = { active ->
+        searchQuery = ""
+        onQueryChange("")
+        onActiveChanged(active)
+    }
     SearchBar(
         query = searchText,
-        onQueryChange = onQueryChange,
-        onSearch = { onActiveChanged(false) }, // Close the search on submit
+        onQueryChange = { query ->
+            searchQuery = query
+            onQueryChange(query)
+        },
+        onSearch = onSearch ?: { activeChanged(false) },
         active = isSearchActive,
-        onActiveChange = onActiveChanged,
-        placeholder = { Text("Search recipes...") },
+        onActiveChange = activeChanged,
+        placeholder = { Text("Search") },
         leadingIcon = {
             if (isSearchActive) {
-                IconButton(onClick = { onActiveChanged(false) }) {
+                IconButton(
+                    onClick = { activeChanged(false) },
+                ) {
                     Icon(
-                        imageVector = Icons.Rounded.ArrowBack,
-                        contentDescription = "Back"
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = stringResource(R.string.navigation_action_back_cd),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 }
             } else {
                 Icon(
                     imageVector = Icons.Rounded.Search,
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         },
-        trailingIcon = if (isSearchActive && searchText.isNotEmpty()) {
+        trailingIcon = if (isSearchActive && searchQuery.isNotEmpty()) {
             {
-                IconButton(onClick = { onQueryChange("") }) {
+                IconButton(
+                    onClick = {
+                        searchQuery = ""
+                        onQueryChange("")
+                    },
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.Close,
-                        contentDescription = "Clear search"
+                        contentDescription = stringResource(R.string.search_text_field_clear),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 }
             }
@@ -116,15 +156,39 @@ fun SimpleSearchBar(
             null
         },
         colors = SearchBarDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = if (isSearchActive) {
+                MaterialTheme.colorScheme.background
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerLow
+            },
         ),
         tonalElevation = 0.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .animateContentSize()
+        windowInsets = WindowInsets(0.dp)
     ) {
-        // You can add extra content inside the dropdown of the search bar if needed
+        LazyColumn {
+            items(recipeList.size) { recipe ->
+                ClickableText(
+                    text = AnnotatedString(recipeList[recipe].title),
+                    onClick = {
+                        onRecipeClick(recipeList[recipe].id)
+                    },
+                    modifier = Modifier
+                        .padding(
+                            start = 8.dp,
+                            top = 4.dp,
+                            end = 8.dp,
+                            bottom = 4.dp
+                        )
+                        .semantics {
+                            contentDescription = "Recipe: ${recipeList[recipe].title}"
+                        },
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+
+            }
+        }
     }
 }
 

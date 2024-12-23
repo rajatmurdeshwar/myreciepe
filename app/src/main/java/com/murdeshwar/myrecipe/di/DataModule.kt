@@ -2,6 +2,10 @@ package com.murdeshwar.myrecipe.di
 
 import dagger.hilt.android.qualifiers.ApplicationContext
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.murdeshwar.myrecipe.BuildConfig
 import com.murdeshwar.myrecipe.data.Repository
@@ -11,6 +15,7 @@ import com.murdeshwar.myrecipe.data.source.local.AppDatabase
 import com.murdeshwar.myrecipe.data.source.local.RecipeDao
 import com.murdeshwar.myrecipe.data.source.network.NetworkDataSource
 import com.murdeshwar.myrecipe.data.source.network.NewRecipeApiService
+import com.murdeshwar.myrecipe.util.AuthInterceptor
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -30,6 +35,19 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindTaskRepository(repository: RepositoryImpl): Repository
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DataStoreModule {
+
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create {
+            context.preferencesDataStoreFile("user_prefs")
+        }
+    }
 }
 
 @Qualifier
@@ -66,11 +84,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(dataStore: DataStore<Preferences>): OkHttpClient {
         return OkHttpClient.Builder()
+            .addInterceptor(AuthInterceptor(dataStore))
             .build()
     }
-
 
     @Provides
     @Singleton
@@ -107,6 +125,5 @@ object NetworkModule {
     fun provideLocalApi(@LocalApi retrofit: Retrofit): NewRecipeApiService {
         return retrofit.create(NewRecipeApiService::class.java)
     }
-
 
 }

@@ -14,30 +14,34 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.murdeshwar.myrecipe.R
+import com.murdeshwar.myrecipe.user.UserViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(onSplashFinished: () -> Unit) {
-    val transition = rememberInfiniteTransition()
+fun SplashScreen(viewModel: UserViewModel = hiltViewModel(), onSplashFinished: (Boolean) -> Unit) {
+    val isLoggedIn by viewModel.readLoginState().collectAsState(initial = false)
+    val transition = rememberInfiniteTransition(label = "")
     val alpha by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 1000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
-        )
+        ), label = ""
     )
 
     LaunchedEffect(Unit) {
-        delay(2000) // Duration for the splash screen
-        onSplashFinished()
+        delay(2000) // Splash screen delay
+        onSplashFinished(isLoggedIn)
     }
 
     Box(

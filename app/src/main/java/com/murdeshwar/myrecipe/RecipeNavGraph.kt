@@ -19,10 +19,7 @@ import com.murdeshwar.myrecipe.user.LoginScreen
 @Composable
 fun RecipeNavGraph(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = RECIPE_SPLASH_ROUTE,
-    navActions: RecipeNavigationActions = remember(navController) {
-        RecipeNavigationActions(navController)
-    }
+    startDestination: String = RECIPE_SPLASH_ROUTE
 ) {
     val isUserLoggedIn = remember { mutableStateOf(false) }
 
@@ -34,6 +31,7 @@ fun RecipeNavGraph(
         // Splash Screen
         composable(RECIPE_SPLASH_ROUTE) {
             SplashScreen {
+                isUserLoggedIn.value = it
                 if (isUserLoggedIn.value) {
                     navController.navigate(RECIPE_HOME_ROUTE) {
                         popUpTo(RECIPE_SPLASH_ROUTE) { inclusive = true }
@@ -69,24 +67,5 @@ fun RecipeNavGraph(
             BottomNavigation(navController)
         }
 
-        composable(
-            route = RecipeDestinations.RECIPE_DETAIL_ROUTE,
-            arguments = listOf(
-                navArgument(RECIPE_ID_ARG) {
-                    type = NavType.IntType
-                    defaultValue = 0
-                }
-            )
-        ) { navBackStackEntry ->
-            val recipeId = navBackStackEntry.arguments?.getInt(RECIPE_ID_ARG)
-            recipeId?.let {
-                RecipeDetailScreen(
-                    recipeId = it,
-                    onBack = {
-                        navController.popBackStack()
-                             },
-                    )
-            }
-        }
     }
 }
