@@ -13,8 +13,9 @@ import com.murdeshwar.myrecipe.RecipeDestinationsArgs.RECIPE_ID_ARG
 import com.murdeshwar.myrecipe.RecipeHome.RECIPE_HOME_ROUTE
 import com.murdeshwar.myrecipe.RecipeLogin.RECIPE_LOGIN_ROUTE
 import com.murdeshwar.myrecipe.SplashScreen.RECIPE_SPLASH_ROUTE
-import com.murdeshwar.myrecipe.details.RecipeDetailScreen
-import com.murdeshwar.myrecipe.user.LoginScreen
+import com.murdeshwar.myrecipe.ui.details.RecipeDetailScreen
+import com.murdeshwar.myrecipe.ui.onboarding.OnBoardingScreen
+import com.murdeshwar.myrecipe.ui.user.LoginScreen
 
 @Composable
 fun RecipeNavGraph(
@@ -37,9 +38,20 @@ fun RecipeNavGraph(
                         popUpTo(RECIPE_SPLASH_ROUTE) { inclusive = true }
                     }
                 } else {
-                    navController.navigate(RECIPE_LOGIN_ROUTE) {
+                    navController.navigate("recipe_onboard") {
                         popUpTo(RECIPE_SPLASH_ROUTE) { inclusive = true }
                     }
+                }
+            }
+        }
+
+        composable(
+            route = "recipe_onboard"
+        ) {
+            OnBoardingScreen {
+                navController.navigate(RECIPE_LOGIN_ROUTE) {
+                    popUpTo(RECIPE_SPLASH_ROUTE) { inclusive = true }
+
                 }
             }
         }
@@ -64,7 +76,7 @@ fun RecipeNavGraph(
         composable(
             route = RECIPE_HOME_ROUTE
         ) {
-            BottomNavigation(navController)
+            BottomNavigation()
         }
 
     }

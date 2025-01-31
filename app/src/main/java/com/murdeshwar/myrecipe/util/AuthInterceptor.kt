@@ -18,7 +18,7 @@ class AuthInterceptor @Inject constructor(
         val urlPath = originalRequest.url().encodedPath() // Use property directly
 
         // Intercept only the specified paths
-        if (urlPath.startsWith("/api/") || urlPath.startsWith("/api/recipes")) {
+        if (urlPath.startsWith("/api/") || urlPath.startsWith("/api/recipes") || urlPath.startsWith("/auth/userDetails")) {
             val token = runBlocking {
                 dataStore.data
                     .map { preferences ->

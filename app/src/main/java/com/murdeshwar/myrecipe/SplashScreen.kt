@@ -22,8 +22,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.murdeshwar.myrecipe.R
-import com.murdeshwar.myrecipe.user.UserViewModel
+import com.murdeshwar.myrecipe.ui.user.UserViewModel
 import kotlinx.coroutines.delay
 
 @Composable
@@ -51,7 +50,7 @@ fun SplashScreen(viewModel: UserViewModel = hiltViewModel(), onSplashFinished: (
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.home_app), // Replace with your logo
+            painter = painterResource(id = R.drawable.recipe_book), // Replace with your logo
             contentDescription = "App Logo",
             modifier = Modifier
                 .size(200.dp)

@@ -4,7 +4,7 @@ import com.murdeshwar.myrecipe.MainCoroutineRule
 import com.murdeshwar.myrecipe.FakeRecipeRepository
 import com.murdeshwar.myrecipe.data.source.Recipe
 import com.murdeshwar.myrecipe.data.source.RecipeWithDetails
-import com.murdeshwar.myrecipe.home.HomeViewModel
+import com.murdeshwar.myrecipe.ui.home.HomeViewModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

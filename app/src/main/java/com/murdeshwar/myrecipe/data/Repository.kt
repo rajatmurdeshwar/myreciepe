@@ -5,7 +5,6 @@ import com.murdeshwar.myrecipe.data.source.Recipe
 import com.murdeshwar.myrecipe.data.source.RecipeSearchData
 import com.murdeshwar.myrecipe.data.source.RecipeWithDetails
 import com.murdeshwar.myrecipe.data.source.User
-import com.murdeshwar.myrecipe.data.source.network.LoginResponse
 import kotlinx.coroutines.flow.Flow
 
 
@@ -28,6 +27,8 @@ interface Repository {
     suspend fun getRecipeDetailsById(id: Int): RecipeWithDetails?
 
     suspend fun addRecipesToDb(recipe: Recipe)
+
+    suspend fun userDetails(): User
 
     suspend fun loginUser(user: LoginUser): String?
 

@@ -106,7 +106,7 @@ object NetworkModule {
     @LocalApi
     fun provideNewRecipeRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/")
+            .baseUrl("https://recipe-maker-7b330babacd7.herokuapp.com/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

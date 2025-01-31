@@ -96,7 +96,9 @@ dependencies {
     // Architecture Components
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.androidx.paging.common.android)
     ksp(libs.room.compiler)
+    implementation(libs.accompanist.swiperefresh)
 
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.lifecycle.viewModelCompose)

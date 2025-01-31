@@ -2,7 +2,6 @@ package com.murdeshwar.myrecipe.data.source
 
 import com.murdeshwar.myrecipe.data.Repository
 import com.murdeshwar.myrecipe.data.source.local.RecipeDao
-import com.murdeshwar.myrecipe.data.source.network.LoginResponse
 import com.murdeshwar.myrecipe.data.source.network.NetworkDataSource
 import com.murdeshwar.myrecipe.data.source.network.NewRecipeApiService
 import com.murdeshwar.myrecipe.data.tUioExternal
@@ -122,6 +121,26 @@ class RepositoryImpl @Inject constructor(
             Timber.tag("RepositoryImpl").e("Exception: ${e.message}")
         }
 
+    }
+
+    override suspend fun userDetails(): User {
+        try {
+            val response = localApi.getUserDetails()
+            if (response.isSuccessful) {
+                response.body()?.let { user ->
+                    Timber.tag("RepositoryImpl").i("User data fetched successfully: $user")
+                    return user
+                }
+            } else {
+                val error = response.errorBody()?.string() ?: "Unknown error"
+                Timber.tag("RepositoryImpl").e("Failed to fetch User data. Error: $error, Code: ${response.code()}")
+                throw Exception("Error fetching user details: $error")
+            }
+        } catch (e: Exception) {
+            Timber.tag("RepositoryImpl").e("Exception while fetching user details: ${e.message}")
+            throw e
+        }
+        throw IllegalStateException("Unexpected error fetching user details")
     }
 
     override suspend fun loginUser(user: LoginUser): String {

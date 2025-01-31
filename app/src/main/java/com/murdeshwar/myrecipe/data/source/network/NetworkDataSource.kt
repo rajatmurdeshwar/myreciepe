@@ -37,5 +37,11 @@ interface NetworkDataSource {
         @Query("apiKey") apiKey: String = API_KEY
     ): Recipes
 
+    @GET("recipes/{id}/similar")
+    suspend fun getRecipeByRecommendation(
+        @Path("id") id: Int,
+        @Query("apiKey") apiKey: String = API_KEY
+    ): Recipes
+
 
 }

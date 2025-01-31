@@ -6,6 +6,7 @@ import com.murdeshwar.myrecipe.data.source.User
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface NewRecipeApiService {
@@ -16,8 +17,11 @@ interface NewRecipeApiService {
     @POST("auth/login")
     suspend fun login(@Body login: LoginUser) : Response<LoginResponse>
 
-    @POST("api/")
+    @POST("api/addRecipe")
     suspend fun addRecipe(@Body recipe: Recipe): Response<Void>
+
+    @POST("auth/userDetails")
+    suspend fun getUserDetails(): Response<User>
 
     @GET("api/recipes")
     suspend fun getRecipes(): Response<Recipes>
