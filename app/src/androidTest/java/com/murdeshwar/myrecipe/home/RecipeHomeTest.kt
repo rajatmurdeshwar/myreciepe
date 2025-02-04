@@ -9,13 +9,11 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.murdeshwar.myrecipe.BottomNavigation
 import com.murdeshwar.myrecipe.HiltTestActivity
 import com.murdeshwar.myrecipe.R
 import com.murdeshwar.myrecipe.data.Repository
 import com.murdeshwar.myrecipe.ui.theme.MyRecipesTheme
 import dagger.hilt.android.testing.HiltAndroidRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.runner.RunWith
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -25,7 +23,6 @@ import javax.inject.Inject
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 @HiltAndroidTest
-@OptIn(ExperimentalCoroutinesApi::class)
 class RecipeHomeTest {
 
     @get:Rule(order = 0)

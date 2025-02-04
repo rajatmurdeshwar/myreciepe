@@ -16,36 +16,33 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-val DarkColorScheme = darkColorScheme(
-    primary = GreenPrimary,
-    secondary = GreenSecondary,
-    tertiary = Color(0xFF739D74),
-    background = Color(0xFF1C1B1F),
-    surface = Color(0xFF2C2C2C),
-    onPrimary = GreenOn,
-    onSecondary = GreenOn,
-    onTertiary = GreenOn,
-    onBackground = Color(0xFFF5F5F5),
-    onSurface = Color(0xFFF5F5F5),
-    error = Color(0xFFD95F51),
-    onError = GreenOn // Added for completeness
+val DarkColors = darkColorScheme(
+    primary = Color(0xFF8CD7A1),
+    onPrimary = Color(0xFF1B3A2A),
+    secondary = Color(0xFFBCCF78),
+    onSecondary = Color(0xFF1D250E),
+    background = Color(0xFF121212),
+    onBackground = Color(0xFFE0E0E0),
+    surface = Color(0xFF1E1E1E),
+    onSurface = Color(0xFFE0E0E0),
+    error = Color(0xFFFF6659),
+    onError = Color(0xFF1B1B1B)
 )
 
 
-val LightColorScheme = lightColorScheme(
+val LightColors = lightColorScheme(
     primary = GreenPrimary,
-    secondary = GreenSecondary,
-    tertiary = Color(0xFF739D74),
-    background = Color(0xFFF5F5F5),
-    surface = Color(0xFFEFEFEF),
     onPrimary = GreenOn,
+    secondary = GreenSecondary,
     onSecondary = GreenOn,
-    onTertiary = GreenOn,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    error = Color(0xFFD95F51),
-    onError = GreenOn // Added for completeness
+    background = GreenOn,
+    onBackground = Color(0xFF1B1B1B),
+    surface = Color(0xFFF5F5F5),
+    onSurface = Color(0xFF1B1B1B),
+    error = Color(0xFFD32F2F),
+    onError = GreenOn
 )
+
 
 
 @Composable
@@ -60,8 +57,8 @@ fun MyRecipesTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> DarkColors
+        else -> LightColors
     }
     val view = LocalView.current
     if (!view.isInEditMode) {

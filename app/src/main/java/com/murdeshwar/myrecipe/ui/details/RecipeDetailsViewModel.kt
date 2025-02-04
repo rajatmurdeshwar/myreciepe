@@ -6,11 +6,11 @@ import com.murdeshwar.myrecipe.data.Repository
 import com.murdeshwar.myrecipe.data.source.RecipeWithDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,14 +19,17 @@ class RecipeDetailsViewModel@Inject constructor(
     private val repository: Repository,
 ) : ViewModel() {
 
-    private val _recipe : MutableStateFlow<RecipeWithDetails?> = MutableStateFlow(null)
-    val recipe = _recipe.asStateFlow()
+    private val _recipe = MutableStateFlow(RecipeDetailsUiState(isLoading = true))
+    val recipe : StateFlow<RecipeDetailsUiState> = _recipe.asStateFlow()
+
+    private val _userMessage = MutableStateFlow<String?>(null)
+    val userMessage = _userMessage.asStateFlow()
 
     fun getRecipeByID(recipeId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getRecipeById(recipeId).collectLatest {
-                if (it != null) {
-                    _recipe.value = it
+        viewModelScope.launch {
+            repository.getRecipeById(recipeId).collectLatest {recipe ->
+                if (recipe != null) {
+                    _recipe.value = RecipeDetailsUiState(recipeWithDetails = recipe)
                 } else {
                     getRecipeDetailsByID(recipeId)
                 }
@@ -42,9 +45,10 @@ class RecipeDetailsViewModel@Inject constructor(
                 // Step 2: Add to local database
                 repository.insertRecipe(recipe)
 
-            } catch (e: Exception) {
-                // Handle failure in either step
+                _userMessage.value = "Recipe successfully saved! 🎉"
 
+            } catch (e: Exception) {
+                _userMessage.value = "Failed to save recipe. Please try again."
             }
         }
     }
@@ -52,10 +56,21 @@ class RecipeDetailsViewModel@Inject constructor(
     private fun getRecipeDetailsByID(recipeId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val recipeDetail = repository.getRecipeDetailsById(recipeId)
-            recipeDetail.let {
-                _recipe.emit(it)
+            _recipe.update {
+                RecipeDetailsUiState(recipeWithDetails = recipeDetail, isLoading = false)
             }
         }
     }
 
+    fun clearUserMessage() {
+        _userMessage.value = null
+    }
+
+
 }
+data class RecipeDetailsUiState(
+    val recipeWithDetails: RecipeWithDetails? = null,
+    val isLoading: Boolean = false,
+    val userMessage: String? = null,
+    val emptyItems: Boolean = false
+)

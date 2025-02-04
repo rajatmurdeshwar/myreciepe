@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import java.lang.Exception
 
-class FakeRecipeRepository: Repository {
+class FakeRepository: Repository {
 
     private var shouldThrowError = false
 

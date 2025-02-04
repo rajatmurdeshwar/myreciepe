@@ -25,7 +25,7 @@ import com.murdeshwar.myrecipe.ui.theme.MyRecipesTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeDetailTopAppBar(titleName:String,onBack: () -> Unit,onSaveRecipeClick: () -> Unit) {
+fun RecipeDetailTopAppBar(titleName:String,onBack: () -> Unit) {
     TopAppBar(
         title = {
             Text(text = titleName,
@@ -46,15 +46,7 @@ fun RecipeDetailTopAppBar(titleName:String,onBack: () -> Unit,onSaveRecipeClick:
             containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.onPrimary,
             navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-    ), actions = {
-            IconButton(onClick = onSaveRecipeClick) {
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    contentDescription = stringResource(id = R.string.menu_saved),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer)
-
-            }
-        },
+    ),
         windowInsets = WindowInsets(0.dp)
     )
 }
@@ -111,7 +103,7 @@ fun RecipeHomeTopAppBar(onSavedRecipes: () -> Unit, onRefreshClick: () -> Unit, 
 private fun RecipeDetailTopAppBarPreview() {
     MyRecipesTheme {
         Surface {
-            RecipeDetailTopAppBar("Home", onBack = {}, onSaveRecipeClick = {})
+            RecipeDetailTopAppBar("Home", onBack = {})
         }
     }
 }

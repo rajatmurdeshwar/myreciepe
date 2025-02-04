@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.murdeshwar.myrecipe.Dimens.MediumPadding2
 import com.murdeshwar.myrecipe.ui.common.RecipeBackButton
@@ -27,7 +28,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnBoardingScreen(
-    onEvent: (OnBoardingEvent) -> Unit
+    onNavigateToHome: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -41,13 +42,18 @@ fun OnBoardingScreen(
                 when (pagerState.currentPage) {
                     0 -> listOf("", "Next")
                     1 -> listOf("Back", "Next")
-                    2 -> listOf("", "Get Stated")
+                    2 -> listOf("", "Get Started")
                     else -> listOf("", "")
                 }
             }
         }
-        HorizontalPager(state = pagerState) { index ->
-            OnBoardingPage(page = pages[index], modifier = Modifier.padding(start = 16.dp, end = 16.dp))
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.testTag("OnboardingPager")
+        ) { index ->
+            OnBoardingPage(
+                page = pages[index],
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp))
         }
         // To put the Indicators and buttons at the bottom of the screen we can use "Spacer" and weight "1f"
         Spacer(modifier = Modifier.weight(1f))
@@ -85,7 +91,7 @@ fun OnBoardingScreen(
                     onClick = {
                         coroutine.launch {
                             if (pagerState.currentPage == 2) {
-                                onEvent(OnBoardingEvent.SaveAppEntry)
+                                onNavigateToHome()
                             } else {
                                 pagerState.animateScrollToPage(
                                     page = pagerState.currentPage + 1
@@ -95,9 +101,7 @@ fun OnBoardingScreen(
                     })
             }
         }
-
         Spacer(modifier = Modifier.weight(0.5f))
-
-
     }
 }
+

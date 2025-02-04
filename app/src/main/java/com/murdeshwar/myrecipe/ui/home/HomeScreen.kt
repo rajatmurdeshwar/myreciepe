@@ -1,6 +1,7 @@
 package com.murdeshwar.myrecipe.ui.home
 
 
+import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -65,6 +66,8 @@ import com.bumptech.glide.integration.compose.placeholder
 
 import com.murdeshwar.myrecipe.R
 import com.murdeshwar.myrecipe.data.source.Recipe
+import com.murdeshwar.myrecipe.ui.common.EmptyScreen
+import com.murdeshwar.myrecipe.ui.common.RecipeList
 import com.murdeshwar.myrecipe.ui.onboarding.PageIndicator
 import com.murdeshwar.myrecipe.ui.theme.MyRecipesTheme
 
@@ -191,7 +194,6 @@ fun RecipeCategoryComposable(
     )
     LazyRow(
         modifier = Modifier.padding(
-            horizontal = dimensionResource(id = R.dimen.list_item_padding),
             vertical = dimensionResource(id = R.dimen.vertical_margin)
         )
     ) {
@@ -213,7 +215,7 @@ fun CircularImageWithText(
     Column(
         modifier = Modifier
             .padding(
-                horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                horizontal = dimensionResource(id = R.dimen.horizontal_margin),
                 vertical = dimensionResource(id = R.dimen.vertical_margin),
 
             ),
@@ -261,10 +263,7 @@ fun FeaturedBanner(
             color = MaterialTheme.colorScheme.onSurface
         )
         if (recipeUiState.items.isEmpty()) {
-            Image(
-                painter = painterResource(id = R.drawable.tray_on_hand),
-                contentDescription = stringResource(id = R.string.tray_on_hand)
-            )
+            EmptyScreen()
         }
         if (recipeUiState.isLoading) {
             Box(
@@ -283,7 +282,6 @@ fun FeaturedBanner(
             ) { page ->
                 val recipe = recipeUiState.items[page]
                 val recipeImage = recipe?.itemImage ?: R.drawable.card_shape
-                // Each page is an image card
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -295,20 +293,49 @@ fun FeaturedBanner(
                         recipe?.let { onRecipeClick(it) }
                     }
                 ) {
-                    GlideImage(
-                        model = recipeImage,
-                        contentDescription = "Recipe Image for Page $page",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
                     ) {
-                        it.error{ placeholder(R.drawable.card_shape) }
-                    }
-                    if (recipe != null) {
-                        Text(text = recipe.title)
-                    }
+                        // Recipe Image (Thumbnail)
+                        GlideImage(
+                            model = recipeImage,
+                            contentDescription = "Recipe Image for Page $page",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        ) {
+                            it.error { placeholder(R.drawable.card_shape) }
+                        }
 
+                        // Gradient Overlay for better text readability
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color.Transparent,
+                                            Color.Black.copy(alpha = 0.7f)  // Darken bottom for contrast
+                                        ),
+                                        startY = 300f // Adjust gradient start position
+                                    )
+                                )
+                        )
+
+                        // Recipe Name Text - Positioned at the bottom center
+                        if (recipe != null) {
+                            Text(
+                                text = recipe.title,
+                                color = Color.White, // White text for contrast
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter) // Align text at bottom
+                                    .padding(12.dp) // Add padding for spacing
+                            )
+                        }
+                    }
                 }
+
             }
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -393,7 +420,7 @@ fun SeasonalBanner(
     }
 }
 
-@Preview
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CircularImageWithTextPreview() {
 
@@ -406,6 +433,5 @@ private fun CircularImageWithTextPreview() {
             )
         }
     }
-
 }
 

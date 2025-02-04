@@ -1,6 +1,5 @@
 package com.murdeshwar.myrecipe.ui.favorite
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -41,6 +40,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.murdeshwar.myrecipe.R
 import com.murdeshwar.myrecipe.data.source.Recipe
+import com.murdeshwar.myrecipe.ui.common.EmptyScreen
 import com.murdeshwar.myrecipe.ui.home.RecipeUiState
 
 @Composable
@@ -87,10 +87,7 @@ fun RecipeListComposable(
 
         // Show tray image if no recipes are available
         if (recipeUiState.items.isEmpty()) {
-            Image(
-                painter = painterResource(id = R.drawable.tray_on_hand),
-                contentDescription = stringResource(id = R.string.tray_on_hand)
-            )
+            EmptyScreen()
         }
 
         // Show loading indicator if data is loading, otherwise show recipe list
@@ -151,7 +148,7 @@ fun MyRecipeListItem(
                     contentDescription = "",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
-                    failure = placeholder(R.drawable.card_shape)
+                    failure = placeholder(R.drawable.ic_platter)
                 )
                 Box(modifier = Modifier
                     .fillMaxSize()
@@ -161,7 +158,7 @@ fun MyRecipeListItem(
                     color = Color.White,
                     modifier = Modifier.align(Alignment.BottomCenter),
                     maxLines = 1,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodyLarge
                 )
 
             }

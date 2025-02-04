@@ -43,8 +43,8 @@ fun EmptyScreen(error: LoadState.Error? = null) {
     }
 
     if (error == null){
-        message = "You have not saved news so far !"
-        icon = R.drawable.ic_search_document
+        message = "You have not saved recipes so far !"
+        icon = R.drawable.ic_platter
     }
 
     var startAnimation by remember {

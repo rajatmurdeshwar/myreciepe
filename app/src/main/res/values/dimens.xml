@@ -11,4 +11,22 @@
     <dimen name="header_padding">16dp</dimen>
     <dimen name="header_image_width">100dp</dimen>
 
+        <!-- Padding and Margins -->
+    <dimen name="padding_small">4dp</dimen>
+    <dimen name="padding_medium">6dp</dimen>
+    <dimen name="padding_large">8dp</dimen>
+    <dimen name="padding_xlarge">16dp</dimen>
+
+        <!-- Heights and Widths -->
+    <dimen name="image_height">200dp</dimen>
+
+        <!-- Text Sizes -->
+    <dimen name="text_size_small">16sp</dimen>
+    <dimen name="text_size_medium">20sp</dimen>
+    <dimen name="text_size_large">24sp</dimen>
+
+        <!-- Border Stroke -->
+    <dimen name="chip_border_stroke">1dp</dimen>
+
+
 </resources>
