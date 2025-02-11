@@ -50,7 +50,7 @@ fun BottomNavigation() {
                     modifier = Modifier
                         .fillMaxWidth(),
                     tonalElevation = 10.dp,
-                    containerColor = MaterialTheme.colorScheme.background,
+                    containerColor = MaterialTheme.colorScheme.surface,
                     windowInsets = WindowInsets(0.dp)
                 ) {
                     navigationItems.forEach { navigationItem ->
@@ -80,9 +80,9 @@ fun BottomNavigation() {
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.primary,
                                 selectedTextColor = MaterialTheme.colorScheme.primary,
-                                unselectedIconColor = colorResource(R.color.body),
-                                unselectedTextColor = colorResource(R.color.body),
-                                indicatorColor = MaterialTheme.colorScheme.background
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                indicatorColor = MaterialTheme.colorScheme.surfaceVariant
                             )
                         )
                     }

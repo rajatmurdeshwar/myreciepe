@@ -63,6 +63,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
+import com.murdeshwar.myrecipe.Dimens.Elevation
 
 import com.murdeshwar.myrecipe.R
 import com.murdeshwar.myrecipe.data.source.Recipe
@@ -291,7 +292,7 @@ fun FeaturedBanner(
                         .fillMaxSize(), // Fill the available space
                     onClick = {
                         recipe?.let { onRecipeClick(it) }
-                    }
+                    }, elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
                 ) {
                     Box(
                         modifier = Modifier
@@ -389,7 +390,7 @@ fun SeasonalBanner(
                             .fillMaxSize(), // Fill the available space
                         onClick = {
                             recipeUiState.seasonalRecipes[it]?.let { it1 -> onRecipeClick(it1) }
-                        }
+                        }, elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
                     ) {
 
                         Column {

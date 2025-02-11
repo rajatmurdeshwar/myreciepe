@@ -38,6 +38,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.murdeshwar.myrecipe.Dimens.Elevation
 import com.murdeshwar.myrecipe.R
 import com.murdeshwar.myrecipe.data.source.Recipe
 import com.murdeshwar.myrecipe.ui.common.EmptyScreen
@@ -130,7 +131,7 @@ fun MyRecipeListItem(
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
+            ), elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
 
         ) {
             val sizeImage by remember { mutableStateOf(IntSize.Zero) }
