@@ -1,9 +1,8 @@
 package com.murdeshwar.myrecipe.ui.home
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 object SeasonalTags {
     private val seasonalMap = mapOf(
@@ -20,10 +19,10 @@ object SeasonalTags {
         "12-01" to "winter" // Winter (December to February)
     )
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun getCurrentSeasonalTag(): String {
-        val currentDate = LocalDate.now()
-        val currentMonthDay = currentDate.format(DateTimeFormatter.ofPattern("MM-dd"))
+        val calendar = Calendar.getInstance()
+        val formatter = SimpleDateFormat("MM-dd", Locale.getDefault())
+        val currentMonthDay = formatter.format(calendar.time)
 
         // Check for specific festivals/holidays
         seasonalMap[currentMonthDay]?.let {
@@ -31,7 +30,7 @@ object SeasonalTags {
         }
 
         // Default to seasons
-        return when (currentDate.monthValue) {
+        return when (calendar.get(Calendar.MONTH) + 1) {
             in 3..5 -> "spring"
             in 6..8 -> "summer"
             in 9..11 -> "autumn"

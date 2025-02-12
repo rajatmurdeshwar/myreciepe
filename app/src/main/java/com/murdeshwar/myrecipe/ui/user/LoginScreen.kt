@@ -80,7 +80,7 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp),
+                .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -96,7 +96,7 @@ fun LoginScreen(
 
             Text(
                 modifier = Modifier
-                    .padding(bottom = 50.dp)
+                    .padding(bottom = 16.dp)
                     .wrapContentSize(Alignment.Center),
                 text = "Recipe Maker",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -114,7 +114,7 @@ fun LoginScreen(
                 SignUpComposable { user -> userViewModel.signup(user) }
             }
 
-            Spacer(modifier = Modifier.weight(0.5f))
+
 
             TextButton(onClick = { isLoginScreen = !isLoginScreen }) {
                 Text(
@@ -122,7 +122,7 @@ fun LoginScreen(
                     color = MaterialTheme.colorScheme.onSurface)
 
             }
-            Spacer(modifier = Modifier.weight(0.5f))
+
 
         }
     }

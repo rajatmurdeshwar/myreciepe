@@ -14,8 +14,8 @@ android {
         applicationId = "com.murdeshwar.myrecipe"
         minSdk = 24
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.2.1"
 
 
         testInstrumentationRunner = "com.murdeshwar.myrecipe.HiltTestRunner"
@@ -45,7 +45,7 @@ android {
 
     buildTypes {
         debug {
-
+            isDebuggable = true
         }
         release {
             isMinifyEnabled = true

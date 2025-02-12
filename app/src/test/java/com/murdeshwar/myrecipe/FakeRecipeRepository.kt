@@ -52,7 +52,7 @@ class FakeRecipeRepository: Repository {
         _savedRecipe.value[1] = mockRecipe
     }
 
-    override suspend fun getLocalRecipes(): List<Recipe>? {
+    override suspend fun getLocalRecipes(): List<Recipe> {
         if (shouldThrowError) {
             throw Exception("Test exception")
         }

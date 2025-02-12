@@ -2,17 +2,15 @@ package com.murdeshwar.myrecipe.ui.home
 
 
 import android.content.res.Configuration
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,14 +31,12 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,25 +53,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.murdeshwar.myrecipe.Dimens.Elevation
-
 import com.murdeshwar.myrecipe.R
 import com.murdeshwar.myrecipe.data.source.Recipe
 import com.murdeshwar.myrecipe.ui.common.EmptyScreen
-import com.murdeshwar.myrecipe.ui.common.RecipeList
+import com.murdeshwar.myrecipe.ui.common.shimmerEffect
 import com.murdeshwar.myrecipe.ui.onboarding.PageIndicator
 import com.murdeshwar.myrecipe.ui.theme.MyRecipesTheme
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     onRecipeClick: (Recipe) -> Unit,
     onSearchButtonClick: () -> Unit
@@ -83,59 +76,54 @@ fun HomeScreen(
     val recipeUiState by viewModel.recipeUiState.collectAsStateWithLifecycle()
     var categoryTitle by remember { mutableStateOf("Random") }
 
-
-    Box {
-        // Background Image
-        Image(
-            modifier = modifier.fillMaxSize(),
-            painter = painterResource(id = R.drawable.home_background),
-            contentDescription = "background_image",
-            contentScale = ContentScale.FillBounds
-        )
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent.copy(alpha = 0.1f),
-                            if (isSystemInDarkTheme()) Color.Black.copy(alpha = 0.5f)
-                            else Color.White.copy(alpha = 0.5f)
-                        )
-                    )
-                )
-        )
-
-            LazyColumn{
-                item {
-                    SearchBarButton (
-                        onSearchIconClick = onSearchButtonClick
-                    )
-                }
-                item {
-                    Text(
-                        text = "Categories",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(
-                            horizontal = dimensionResource(id = R.dimen.list_item_padding),
-                            vertical = dimensionResource(id = R.dimen.vertical_margin)
-                        )
-                    )
-                    RecipeCategoryComposable(onCategoryClick = { category ->
-                        categoryTitle = category
-                        viewModel.getOnlineRecipesWithTags(category)
-                    })
-                }
-                item {
-                    FeaturedBanner(recipeUiState = recipeUiState, onRecipeClick = onRecipeClick)
-                }
-                item {
-                    SeasonalBanner(recipeUiState = recipeUiState, onRecipeClick = onRecipeClick)
-                }
-            }
+    // Use LazyColumn to handle a large amount of data efficiently
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(vertical = 8.dp) // Add padding for better spacing
+    ) {
+        // Search Bar
+        item {
+            SearchBarButton(
+                onSearchIconClick = onSearchButtonClick,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
         }
 
+        // Categories Section
+        item {
+            Text(
+                text = "Categories",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+            RecipeCategoryComposable(
+                onCategoryClick = { category ->
+                    categoryTitle = category
+                    viewModel.getOnlineRecipesWithTags(category)
+                },
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+
+        // Featured Banner Section
+        item {
+            FeaturedBanner(
+                recipeUiState = recipeUiState,
+                onRecipeClick = onRecipeClick,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+
+        // Seasonal Banner Section
+        item {
+            SeasonalBanner(
+                recipeUiState = recipeUiState,
+                onRecipeClick = onRecipeClick,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+    }
 }
 
 @Composable
@@ -183,6 +171,7 @@ fun SearchBarButton(
 @Composable
 fun RecipeCategoryComposable(
     onCategoryClick: (String) -> Unit,
+    modifier: Modifier
 ) {
     val categories = listOf(
         Pair("Vegetarian", R.drawable.veggies),
@@ -244,42 +233,106 @@ fun CircularImageWithText(
 fun FeaturedBanner(
     recipeUiState: RecipeUiState,
     onRecipeClick: (Recipe) -> Unit,
+    modifier: Modifier
 ) {
-
     // State for managing the pager
     val pagerState = rememberPagerState(
         initialPage = 0,
-        pageCount = { recipeUiState.items.size} // Total number of pages
+        pageCount = { recipeUiState.items.size } // Total number of pages
     )
 
     Column {
         // Title for the banner
         Text(
             text = "Recipe of the Day",
-            modifier = Modifier.padding(
+            modifier = modifier.padding(
                 horizontal = dimensionResource(id = R.dimen.list_item_padding),
                 vertical = dimensionResource(id = R.dimen.vertical_margin)
             ),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
-        if (recipeUiState.items.isEmpty()) {
-            EmptyScreen()
-        }
+
+        // Show shimmer effect or content based on loading state
         if (recipeUiState.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+            // Shimmer effect for the loading state
+            HorizontalPager(
+                state = rememberPagerState(pageCount = { 3 }), // Show 3 shimmer placeholders
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+            ) { page ->
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    ),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxSize(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        // Shimmer effect for the image
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .shimmerEffect()
+                        )
+
+                        // Shimmer effect for the gradient overlay
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color.Transparent,
+                                            Color.Black.copy(alpha = 0.7f)
+                                        ),
+                                        startY = 300f
+                                    )
+                                )
+                        )
+
+                        // Shimmer effect for the recipe title
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .fillMaxWidth(0.8f)
+                                .height(24.dp)
+                                .padding(12.dp)
+                                .shimmerEffect()
+                        )
+                    }
+                }
             }
+
+            // Shimmer effect for the page indicator
+            Row(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = 8.dp)
+            ) {
+                repeat(3) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .shimmerEffect()
+                            .padding(horizontal = 4.dp)
+                    )
+                }
+            }
+        } else if (recipeUiState.items.isEmpty()) {
+            // Show empty state
+            EmptyScreen()
         } else {
-            // Horizontal Pager for scrolling through cards
+            // Show actual content
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp) // Set the height for the pager
+                    .height(250.dp)
             ) { page ->
                 val recipe = recipeUiState.items[page]
                 val recipeImage = recipe?.itemImage ?: R.drawable.card_shape
@@ -288,16 +341,14 @@ fun FeaturedBanner(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     ),
                     modifier = Modifier
-                        .padding(8.dp) // Add spacing between cards
-                        .fillMaxSize(), // Fill the available space
+                        .padding(8.dp)
+                        .fillMaxSize(),
                     onClick = {
                         recipe?.let { onRecipeClick(it) }
-                    }, elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
+                    },
+                    elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
                         // Recipe Image (Thumbnail)
                         GlideImage(
                             model = recipeImage,
@@ -316,9 +367,9 @@ fun FeaturedBanner(
                                     Brush.verticalGradient(
                                         colors = listOf(
                                             Color.Transparent,
-                                            Color.Black.copy(alpha = 0.7f)  // Darken bottom for contrast
+                                            Color.Black.copy(alpha = 0.7f)
                                         ),
-                                        startY = 300f // Adjust gradient start position
+                                        startY = 300f
                                     )
                                 )
                         )
@@ -327,25 +378,24 @@ fun FeaturedBanner(
                         if (recipe != null) {
                             Text(
                                 text = recipe.title,
-                                color = Color.White, // White text for contrast
+                                color = Color.White,
                                 style = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier
-                                    .align(Alignment.BottomCenter) // Align text at bottom
-                                    .padding(12.dp) // Add padding for spacing
+                                    .align(Alignment.BottomCenter)
+                                    .padding(12.dp)
                             )
                         }
                     }
                 }
-
             }
-            Spacer(modifier = Modifier.height(8.dp))
 
+            // Page Indicator
+            Spacer(modifier = Modifier.height(8.dp))
             PageIndicator(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 pageSize = recipeUiState.items.size,
-                selectedPage =pagerState.currentPage
+                selectedPage = pagerState.currentPage
             )
-
         }
     }
 }
@@ -355,55 +405,98 @@ fun FeaturedBanner(
 fun SeasonalBanner(
     recipeUiState: RecipeUiState,
     onRecipeClick: (Recipe) -> Unit,
-){
+    modifier: Modifier
+) {
+    val seasonalTag = remember { SeasonalTags.getCurrentSeasonalTag() }
+    val seasonalText = seasonalTagToText(seasonalTag)
+
     Column {
         // Title for the banner
         Text(
-            text = "Holiday Special",
-            modifier = Modifier.padding(
+            text = seasonalText,
+            modifier = modifier.padding(
                 horizontal = dimensionResource(id = R.dimen.list_item_padding),
                 vertical = dimensionResource(id = R.dimen.vertical_margin)
             ),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
-        if (recipeUiState.seasonalRecipes.isEmpty()) {
-            Image(
-                painter = painterResource(id = R.drawable.tray_on_hand),
-                contentDescription = stringResource(id = R.string.tray_on_hand)
-            )
-        }
+
+        // Show shimmer effect or content based on loading state
         if (recipeUiState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else {
+            // Shimmer effect for the loading state
             LazyVerticalGrid(
                 GridCells.Fixed(2),
                 modifier = Modifier.height(500.dp)
             ) {
-                items(recipeUiState.seasonalRecipes.size) {
+                items(6) { // Show 6 shimmer placeholders
                     Card(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                         ),
                         modifier = Modifier
-                            .padding(8.dp) // Add spacing between cards
-                            .fillMaxSize(), // Fill the available space
-                        onClick = {
-                            recipeUiState.seasonalRecipes[it]?.let { it1 -> onRecipeClick(it1) }
-                        }, elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
+                            .padding(8.dp)
+                            .fillMaxSize(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
                     ) {
+                        Column {
+                            // Shimmer effect for the image
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .shimmerEffect()
+                            )
 
+                            // Shimmer effect for the title
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(24.dp)
+                                    .padding(4.dp)
+                                    .shimmerEffect()
+                            )
+                        }
+                    }
+                }
+            }
+        } else if (recipeUiState.seasonalRecipes.isEmpty()) {
+            // Show empty state image
+            Image(
+                painter = painterResource(id = R.drawable.tray_on_hand),
+                contentDescription = stringResource(id = R.string.tray_on_hand)
+            )
+        } else {
+            // Show actual content
+            LazyVerticalGrid(
+                GridCells.Fixed(2),
+                modifier = Modifier.height(500.dp)
+            ) {
+                items(recipeUiState.seasonalRecipes.size) { index ->
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        ),
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxSize(),
+                        onClick = {
+                            recipeUiState.seasonalRecipes[index]?.let { recipe ->
+                                onRecipeClick(recipe)
+                            }
+                        },
+                        elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
+                    ) {
                         Column {
                             GlideImage(
-                                model = recipeUiState.seasonalRecipes[it]?.itemImage,
-                                contentDescription = "Recipe Image for Page ",
+                                model = recipeUiState.seasonalRecipes[index]?.itemImage,
+                                contentDescription = "Recipe Image for Page $index",
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop,
                                 failure = placeholder(R.drawable.card_shape)
                             )
-                            recipeUiState.seasonalRecipes[it]?.let { it1 ->
+                            recipeUiState.seasonalRecipes[index]?.let { recipe ->
                                 Text(
-                                    text = it1.title,
+                                    text = recipe.title,
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.padding(4.dp),
                                     color = MaterialTheme.colorScheme.onSurface,
@@ -412,12 +505,24 @@ fun SeasonalBanner(
                                 )
                             }
                         }
-
                     }
                 }
-
             }
         }
+    }
+}
+
+fun seasonalTagToText(tag: String): String {
+    return when (tag) {
+        "new-year" -> "New Year Special 🎉"
+        "valentines-day" -> "Valentine's Day Special ❤️"
+        "halloween" -> "Halloween Treats 🎃"
+        "christmas" -> "Christmas Delights 🎄"
+        "spring" -> "Spring Fresh Recipes 🌸"
+        "summer" -> "Summer Refreshments ☀️"
+        "autumn" -> "Autumn Flavors 🍂"
+        "winter" -> "Winter Warmers ❄️"
+        else -> "Holiday Special"
     }
 }
 

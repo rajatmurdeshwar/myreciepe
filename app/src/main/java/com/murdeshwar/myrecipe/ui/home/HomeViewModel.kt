@@ -1,7 +1,5 @@
 package com.murdeshwar.myrecipe.ui.home
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.murdeshwar.myrecipe.data.Repository
@@ -24,7 +22,6 @@ data class RecipeUiState(
     val emptyItems: Boolean = false
 )
 
-@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: Repository,
@@ -44,7 +41,7 @@ class HomeViewModel @Inject constructor(
             try {
                 val recipes = tags?.let { repository.getOnlineRecipesWithTags(it) }
                     ?: repository.getOnlineRecipes()
-                recipes?.let { list ->
+                recipes.let { list ->
                     _recipeUiState.update {
                         it.copy(
                             items = list,
@@ -66,7 +63,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun fetchSeasonalRecipe() {
         _recipeUiState.update { it.copy(isLoading = true) }
         viewModelScope.launch(IO) {
@@ -98,7 +94,4 @@ class HomeViewModel @Inject constructor(
         fetchSeasonalRecipe()
     }
 
-    fun clearUserMessage() {
-        _recipeUiState.update { it.copy(userMessage = null) }
-    }
 }
