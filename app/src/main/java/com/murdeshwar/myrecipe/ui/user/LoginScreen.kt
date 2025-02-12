@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -35,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -42,19 +44,36 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.murdeshwar.myrecipe.R
 import com.murdeshwar.myrecipe.data.source.LoginUser
 import com.murdeshwar.myrecipe.data.source.User
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun LoginScreen(
     userViewModel: UserViewModel = hiltViewModel(),
     onLoginSuccess: () -> Unit,
-    onSignUpSuccess: () -> Unit ) {
+    onSignUpSuccess: () -> Unit,
+    isOfflineState: StateFlow<Boolean>
+) {
 
     val uiState by userViewModel.uiState.collectAsState()
     var isLoginScreen by remember { mutableStateOf(true) }
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val isOffline by isOfflineState.collectAsStateWithLifecycle()
+
+    // If user is not connected to the internet show a snack bar to inform them.
+    val notConnectedMessage = stringResource(R.string.not_connected)
+    LaunchedEffect(isOffline) {
+        if (isOffline) {
+            snackbarHostState.showSnackbar(
+                message = notConnectedMessage,
+                duration = SnackbarDuration.Indefinite,
+            )
+        }
+    }
 
     // Handle UI Events
     LaunchedEffect(uiState) {

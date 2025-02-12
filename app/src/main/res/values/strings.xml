@@ -7,4 +7,5 @@
     <string name="navigation_action_back_cd">Back Button</string>
     <string name="menu_search">Search bar\n</string>
     <string name="menu_saved">saved recipe</string>
+    <string name="not_connected">No Internet connectivity\n</string>
 </resources>

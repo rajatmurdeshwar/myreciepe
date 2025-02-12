@@ -9,14 +9,21 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -30,9 +37,10 @@ import com.murdeshwar.myrecipe.ui.home.HomeScreen
 import com.murdeshwar.myrecipe.ui.profile.RecipeProfileScreen
 import com.murdeshwar.myrecipe.ui.search.RecipeSearchScreen
 import com.murdeshwar.myrecipe.util.BottomNavigationItem
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun BottomNavigation() {
+fun BottomNavigation(isOfflineState: StateFlow<Boolean>) {
     val bottomNavController = rememberNavController()
     val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
     val navigationItems = BottomNavigationItem().bottomNavigationItems()
@@ -41,7 +49,23 @@ fun BottomNavigation() {
 
     var isBottomBarVisible by remember { mutableStateOf(true) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val isOffline by isOfflineState.collectAsStateWithLifecycle()
+
+    // If user is not connected to the internet show a snack bar to inform them.
+    val notConnectedMessage = stringResource(R.string.not_connected)
+    LaunchedEffect(isOffline) {
+        if (isOffline) {
+            snackbarHostState.showSnackbar(
+                message = notConnectedMessage,
+                duration = SnackbarDuration.Indefinite,
+            )
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (isBottomBarVisible) {
                 NavigationBar(
