@@ -16,17 +16,28 @@ import com.murdeshwar.myrecipe.data.source.local.RecipeDao
 import com.murdeshwar.myrecipe.data.source.network.NetworkDataSource
 import com.murdeshwar.myrecipe.data.source.network.NewRecipeApiService
 import com.murdeshwar.myrecipe.util.AuthInterceptor
+import com.murdeshwar.myrecipe.util.ConnectivityManagerNetworkMonitor
+import com.murdeshwar.myrecipe.util.NetworkMonitor
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class IoDispatcher
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class MainDispatcher
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -78,6 +89,19 @@ object AppModule {
     fun provideMyRepository(mydb: AppDatabase): RecipeDao = mydb.getDao()
 }
 
+@Module
+@InstallIn(SingletonComponent::class)
+object CoroutineDispatcherModule {
+
+    @Provides
+    @IoDispatcher
+    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+    @Provides
+    @MainDispatcher
+    fun provideMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
+}
+
 @InstallIn(SingletonComponent::class)
 @Module
 object NetworkModule {
@@ -124,6 +148,15 @@ object NetworkModule {
     @LocalApi
     fun provideLocalApi(@LocalApi retrofit: Retrofit): NewRecipeApiService {
         return retrofit.create(NewRecipeApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNetworkMonitor(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): NetworkMonitor {
+        return ConnectivityManagerNetworkMonitor(context, ioDispatcher)
     }
 
 }

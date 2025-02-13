@@ -53,7 +53,7 @@ fun OnBoardingScreen(
         ) { index ->
             OnBoardingPage(
                 page = pages[index],
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp))
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp))
         }
         // To put the Indicators and buttons at the bottom of the screen we can use "Spacer" and weight "1f"
         Spacer(modifier = Modifier.weight(1f))
@@ -61,7 +61,7 @@ fun OnBoardingScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = MediumPadding2)
-                .padding(start = 16.dp, end = 16.dp)
+                .padding(start = 8.dp, end = 8.dp)
                 .navigationBarsPadding() // This will calculate the bottom navigation space and then adding it at the bottom of the Row
             ,
             horizontalArrangement = Arrangement.SpaceBetween,

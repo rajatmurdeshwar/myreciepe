@@ -1,4 +1,3 @@
 package com.murdeshwar.myrecipe.data
 
-class DeafultRecipeRepositoryTest {
-}
+class DeafultRecipeRepositoryTest

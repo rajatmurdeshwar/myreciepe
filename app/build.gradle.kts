@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -14,14 +16,21 @@ android {
         applicationId = "com.murdeshwar.myrecipe"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 5
+        versionName = "1.2.2"
 
 
         testInstrumentationRunner = "com.murdeshwar.myrecipe.HiltTestRunner"
 
         buildConfigField("String", "RECIPE_BASE_URL", "\"https://api.spoonacular.com/\"")
-        buildConfigField("String", "RECIPE_API_KEY", "\"70d62e58791441b2874bd5dc63393d10\"")
+        val localProperties = project.rootProject.file("local.properties")
+        val properties = Properties().apply {
+            if (localProperties.exists()) {
+                load(localProperties.inputStream())
+            }
+        }
+        val recipeApiKey = properties.getProperty("RECIPE_API_KEY", "")
+        buildConfigField("String", "RECIPE_API_KEY", "\"$recipeApiKey\"")
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -45,10 +54,10 @@ android {
 
     buildTypes {
         debug {
-
+            isDebuggable = true
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -82,7 +91,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3.android)

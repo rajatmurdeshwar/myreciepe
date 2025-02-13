@@ -1,4 +1,3 @@
 package com.murdeshwar.myrecipe
 
-class RecipeDaoTest {
-}
+class RecipeDaoTest
