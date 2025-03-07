@@ -2,20 +2,33 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="LonginSignupScreenTest">
+      <entry key="LoginScreenPreview_Dark">
         <State />
       </entry>
-      <entry key="OnboardingScreenTest">
+      <entry key="LoginScreenPreview_Light">
+        <State />
+      </entry>
+      <entry key="LonginSignupScreenTest">
         <State />
       </entry>
       <entry key="RecipeDetailsScreenTest">
         <State />
       </entry>
       <entry key="app">
-        <State />
-      </entry>
-      <entry key="onboardingScreen_swipeNavigatesPages()">
-        <State />
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="$USER_HOME$/.android/avd/Pixel_3a_API_33_arm64-v8a.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2025-02-24T23:58:24.226624Z" />
+        </State>
       </entry>
       <entry key="recipeDetailScreen_displaysRecipeDetails()">
         <State />

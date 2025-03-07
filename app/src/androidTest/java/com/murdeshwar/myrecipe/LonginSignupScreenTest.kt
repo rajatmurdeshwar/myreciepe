@@ -12,6 +12,7 @@ import com.murdeshwar.myrecipe.ui.theme.MyRecipesTheme
 import com.murdeshwar.myrecipe.ui.user.LoginScreen
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,7 +35,7 @@ class LonginSignupScreenTest {
     private fun setLoginSignupScreen() {
         composeTestRule.setContent {
             MyRecipesTheme {
-                LoginScreen(onLoginSuccess = {}, onSignUpSuccess = {})
+                LoginScreen(onLoginSuccess = {}, onSignUpSuccess = {}, isOfflineState = MutableStateFlow(false))
             }
         }
     }
@@ -94,7 +95,7 @@ class LonginSignupScreenTest {
     @Test
     fun loginScreen_switchToSignUp() {
         composeTestRule.setContent {
-            LoginScreen(onLoginSuccess = {}, onSignUpSuccess = {})
+            LoginScreen(onLoginSuccess = {}, onSignUpSuccess = {},isOfflineState = MutableStateFlow(false))
         }
 
         // Click sign up button

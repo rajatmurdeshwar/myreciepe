@@ -10,14 +10,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -35,9 +44,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +59,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.murdeshwar.myrecipe.R
 import com.murdeshwar.myrecipe.data.source.LoginUser
 import com.murdeshwar.myrecipe.data.source.User
+import com.murdeshwar.myrecipe.ui.theme.MyRecipesTheme
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
@@ -170,81 +183,105 @@ fun SignUpComposable(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
             label = { Text("Name", color = MaterialTheme.colorScheme.onSurface) },
+            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
             value = name,
+            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
             onValueChange = {
                 name = it
-                nameError = if (it.isEmpty()) "Name cannot be empty" else null
+                nameError = when {
+                    it.isEmpty() -> "Name cannot be empty"
+                    else -> null
+                }
             },
-            singleLine = true,
             isError = nameError != null,
             supportingText = { nameError?.let { Text(it, color = MaterialTheme.colorScheme.error) } }
         )
 
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
             label = { Text("Phone", color = MaterialTheme.colorScheme.onSurface) },
             value = phone,
+            leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
+            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
             onValueChange = {
                 phone = it
-                phoneError = if (it.length != 10 || !it.all { char -> char.isDigit() }) "Enter a valid 10-digit phone number" else null
+                phoneError = when {
+                    it.isEmpty() -> "Phone cannot be empty"
+                    it.length != 10 || !it.all { char -> char.isDigit() } -> "Enter a valid 10-digit phone number"
+                    else -> null
+                }
             },
-            singleLine = true,
             isError = phoneError != null,
             supportingText = { phoneError?.let { Text(it, color = MaterialTheme.colorScheme.error) } }
         )
 
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
             label = { Text("City", color = MaterialTheme.colorScheme.onSurface) },
             value = city,
+            leadingIcon = { Icon(Icons.Default.Map, contentDescription = null) },
+            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
             onValueChange = {
                 city = it
-                cityError = if (it.isEmpty()) "City cannot be empty" else null
+                cityError = when {
+                    it.isEmpty() -> "City cannot be empty"
+                    else -> null
+                }
             },
-            singleLine = true,
             isError = cityError != null,
             supportingText = { cityError?.let { Text(it, color = MaterialTheme.colorScheme.error) } }
         )
 
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
             label = { Text("Email", color = MaterialTheme.colorScheme.onSurface) },
             value = email,
+            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
             onValueChange = {
                 email = it
-                emailError = if (!Patterns.EMAIL_ADDRESS.matcher(it).matches()) "Enter a valid email address" else null
+                emailError = when {
+                    it.isEmpty() -> "Email cannot be empty"
+                    !Patterns.EMAIL_ADDRESS.matcher(it).matches() -> "Enter a valid email address"
+                    else -> null
+                }
             },
-            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             isError = emailError != null,
             supportingText = { emailError?.let { Text(it, color = MaterialTheme.colorScheme.error) } }
         )
 
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
             label = { Text("Password", color = MaterialTheme.colorScheme.onSurface) },
             value = password,
+            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
             onValueChange = {
                 password = it
-                passwordError = if (it.length < 8) "Password must be at least 8 characters" else null
+                passwordError = when {
+                    it.isEmpty() -> "Password cannot be empty"
+                    it.length < 8 -> "Password must be at least 8 characters"
+                    else -> null
+                }
             },
             singleLine = true,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
             trailingIcon = {
+                val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        imageVector = if (passwordVisible) Icons.Filled.Lock else Icons.Outlined.Lock,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                    )
+                    Icon(image, contentDescription = if (passwordVisible) "Hide password" else "Show password")
                 }
             },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             isError = passwordError != null,
             supportingText = { passwordError?.let { Text(it, color = MaterialTheme.colorScheme.error) } }
         )
 
         Button(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = 8.dp),
             onClick = {
                 val user = User(name, phone, city, email, password)
                 onSignUpSubmitClick(user)
@@ -261,61 +298,65 @@ fun SignUpComposable(
 fun LoginComposable(
     onLoginSubmitClick: (LoginUser) -> Unit
 ) {
-
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var usernameError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         OutlinedTextField(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            label = { Text("Username", color = MaterialTheme.colorScheme.onSurface) },
-            leadingIcon = { Icon(Icons.Filled.Person, null) },
+                .fillMaxWidth().padding(vertical = 8.dp),
+            label = { Text("Email", color = MaterialTheme.colorScheme.onSurface) },
+            leadingIcon = { Icon(Icons.Filled.Email, null) },
+            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
             value = username,
             onValueChange = {
                 username = it
-            usernameError = if (it.isEmpty()) {
-                    "Username cannot be empty"
-                } else if (!Patterns.EMAIL_ADDRESS.matcher(it).matches()) {
-                    "Enter a valid email address"
-                } else {
-                    null
+                usernameError = when {
+                    it.isEmpty() -> "Email cannot be empty"
+                    !Patterns.EMAIL_ADDRESS.matcher(it).matches() -> "Enter a valid email address"
+                    else -> null
                 }
             },
             isError = usernameError != null,
             supportingText = {
-                if (usernameError != null) {
-                    Text(usernameError!!, color = MaterialTheme.colorScheme.error)
-                }
+                usernameError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             }
         )
+
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             label = { Text("Password", color = MaterialTheme.colorScheme.onSurface) },
-            leadingIcon = { Icon(Icons.Filled.Lock ,null) },
+            leadingIcon = { Icon(Icons.Filled.Lock, null) },
+            trailingIcon = {
+                IconButton(onClick = { passwordVisible = !passwordVisible}) {
+                    val icon = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    Icon(imageVector = icon, contentDescription = "Toggle password visibility")
+
+                }
+            },
             value = password,
+            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
             onValueChange = {
                 password = it
-                passwordError = if (it.length < 8) {
-                    "Password must be at least 8 characters"
-                } else {
-                    null
+                passwordError = when {
+                    it.isEmpty() -> "Password cannot be empty"
+                    it.length < 8 -> "Password must be at least 8 characters"
+                    else -> null
                 }
-                            },
+            },
             isError = passwordError != null,
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             supportingText = {
-                if (passwordError != null) {
-                    Text(passwordError!!, color = MaterialTheme.colorScheme.error)
-                }
+                passwordError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             }
         )
 
@@ -323,21 +364,18 @@ fun LoginComposable(
             modifier = Modifier.padding(top = 16.dp),
             onClick = {
                 if (usernameError == null && passwordError == null) {
+                    isLoading = false
                     val loginUser = LoginUser(username, password)
                     onLoginSubmitClick(loginUser)
                 }
             },
             enabled = usernameError == null && passwordError == null
         ) {
-            Text(text = "Log In")
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(24.dp))
+            } else {
+                Text(text = "Log In", fontWeight = FontWeight.Bold, color = Color.White)
+            }
         }
-
     }
-
-}
-
-@Preview
-@Composable
-private fun LoginScreenPreview() {
-
 }

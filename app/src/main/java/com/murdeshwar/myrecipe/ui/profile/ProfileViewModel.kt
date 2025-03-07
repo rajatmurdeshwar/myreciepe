@@ -3,7 +3,7 @@ package com.murdeshwar.myrecipe.ui.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.murdeshwar.myrecipe.data.Repository
-import com.murdeshwar.myrecipe.data.source.User
+import com.murdeshwar.myrecipe.data.source.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +17,8 @@ class ProfileViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    private val _userDetails = MutableStateFlow<User?>(null)
-    val userDetails: StateFlow<User?> = _userDetails
+    private val _userDetails = MutableStateFlow<UserData?>(null)
+    val userDetails: StateFlow<UserData?> = _userDetails
 
     init {
         getUserDetails()

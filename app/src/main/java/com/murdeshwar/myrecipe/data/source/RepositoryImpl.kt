@@ -11,7 +11,9 @@ import com.murdeshwar.myrecipe.data.toRecipeSearchDataList
 import com.murdeshwar.myrecipe.data.toUiExternal
 import com.murdeshwar.myrecipe.data.toUiLocal
 import com.murdeshwar.myrecipe.di.FoodApi
+import com.murdeshwar.myrecipe.di.IoDispatcher
 import com.murdeshwar.myrecipe.di.LocalApi
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -24,10 +26,11 @@ import javax.inject.Inject
 class RepositoryImpl @Inject constructor(
     private val dao: RecipeDao,
     @FoodApi private val foodApi: NetworkDataSource,
-    @LocalApi private val localApi: NewRecipeApiService
+    @LocalApi private val localApi: NewRecipeApiService,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : Repository {
     override suspend fun getLocalRecipes(): List<Recipe> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             dao.getAllRecipes().tUioExternal()
         }
     }
@@ -54,7 +57,7 @@ class RepositoryImpl @Inject constructor(
             )
         }
         emit(recipeWithDetails)
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(ioDispatcher)
 
 
     override suspend fun getOnlineRecipes(): List<Recipe?> {
@@ -63,19 +66,22 @@ class RepositoryImpl @Inject constructor(
 
         } catch (e: Exception) {
             Timber.tag("RepositoryImpl").e("Exception %s", e.message)
-            emptyList<Recipe>()
+            emptyList()
         }
     }
 
     override suspend fun insertAllRecipes(recipe: List<RecipeWithDetails>) {
-        dao.insertAllRecipesWithDetails(recipe.toLocal())
+        withContext(ioDispatcher) {
+            dao.insertAllRecipesWithDetails(recipe.toLocal())
+        }
     }
 
     override suspend fun insertRecipe(recipe: RecipeWithDetails) {
-
-        dao.insertRecipe(recipe.toLocal().recipe)
-        dao.insertIngredients(recipe.toLocal().ingredients)
-        dao.insertSteps(recipe.toLocal().steps)
+        withContext(ioDispatcher) {
+            dao.insertRecipe(recipe.toLocal().recipe)
+            dao.insertIngredients(recipe.toLocal().ingredients)
+            dao.insertSteps(recipe.toLocal().steps)
+        }
     }
 
     override suspend fun searchRecipe(recipeName: String): List<RecipeSearchData?> {
@@ -123,7 +129,7 @@ class RepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun userDetails(): User {
+    override suspend fun userDetails(): UserData {
         try {
             val response = localApi.getUserDetails()
             if (response.isSuccessful) {
@@ -143,7 +149,7 @@ class RepositoryImpl @Inject constructor(
         throw IllegalStateException("Unexpected error fetching user details")
     }
 
-    override suspend fun loginUser(user: LoginUser): String {
+    override suspend fun loginUser(user: LoginUser): String? {
         return try {
             val response = localApi.login(user)
             if (response.isSuccessful) {
@@ -167,11 +173,15 @@ class RepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun signupUser(user: User) {
+    override suspend fun signupUser(user: User): String? {
         try {
             val response = localApi.signup(user)
             if (response.isSuccessful) {
-                Timber.tag("RepositoryImpl").i("User registered successfully")
+                val loginResponse = response.body()
+                if (loginResponse != null) {
+                    return loginResponse.token
+                }
+                Timber.tag("RepositoryImpl").d("User registered successfully : ${loginResponse.toString()}")
             } else {
                 val error = response.errorBody()?.string() ?: "Unknown error"
                 Timber.tag("RepositoryImpl").e("Signup failed: $error")
@@ -179,5 +189,6 @@ class RepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Timber.tag("RepositoryImpl").e("Exception occurred during signup: ${e.message}")
         }
+        return ""
     }
 }

@@ -15,9 +15,9 @@ android {
     defaultConfig {
         applicationId = "com.murdeshwar.myrecipe"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 5
-        versionName = "1.2.2"
+        targetSdk = 35
+        versionCode = 9
+        versionName = "1.2.6"
 
 
         testInstrumentationRunner = "com.murdeshwar.myrecipe.HiltTestRunner"
@@ -57,7 +57,7 @@ android {
             isDebuggable = true
         }
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -91,6 +91,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)

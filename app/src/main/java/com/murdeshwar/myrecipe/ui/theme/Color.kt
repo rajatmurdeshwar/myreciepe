@@ -17,7 +17,7 @@ val LightOnSurface = Color(0xFF1B1B1B)
 val LightError = Color(0xFFD32F2F)
 val LightOnError = GreenOn
 
-val DarkPrimary = Color(0xFF8CD7A1)
+val DarkPrimary = Color(0xFFA5D6A7)
 val DarkOnPrimary = Color(0xFF1B3A2A)
 val DarkSecondary = Color(0xFFBCCF78)
 val DarkOnSecondary = Color(0xFF1D250E)

@@ -34,7 +34,11 @@ class UserViewModel @Inject constructor(
     // Signup function
     fun signup(user: User) = viewModelScope.launch {
         try {
-            repository.signupUser(user)
+            val token = repository.signupUser(user)
+            Timber.d("UserViewModel tokenn", "Token :$token")
+            if (token != null) {
+                saveToken(token)
+            }
             _uiState.value = UIEvent.Success("User registered successfully!")
         } catch (e: Exception) {
             _uiState.value = UIEvent.Error("Signup failed: ${e.message}")

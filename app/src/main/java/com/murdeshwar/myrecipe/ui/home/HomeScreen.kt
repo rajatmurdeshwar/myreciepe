@@ -233,7 +233,7 @@ fun CircularImageWithText(
 fun FeaturedBanner(
     recipeUiState: RecipeUiState,
     onRecipeClick: (Recipe) -> Unit,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     // State for managing the pager
     val pagerState = rememberPagerState(
@@ -243,158 +243,53 @@ fun FeaturedBanner(
 
     Column {
         // Title for the banner
-        Text(
-            text = "Recipe of the Day",
-            modifier = modifier.padding(
-                horizontal = dimensionResource(id = R.dimen.list_item_padding),
-                vertical = dimensionResource(id = R.dimen.vertical_margin)
-            ),
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        BannerTitle("Recipe of the Day", modifier)
 
         // Show shimmer effect or content based on loading state
-        if (recipeUiState.isLoading) {
-            // Shimmer effect for the loading state
-            HorizontalPager(
-                state = rememberPagerState(pageCount = { 3 }), // Show 3 shimmer placeholders
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
-            ) { page ->
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    ),
+        when {
+            recipeUiState.isLoading -> ShimmerBannerPlaceholder()
+            recipeUiState.items.isEmpty() -> EmptyScreen()
+            else -> {
+                HorizontalPager(
+                    state = pagerState,
                     modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxSize(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
-                ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        // Shimmer effect for the image
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .shimmerEffect()
-                        )
-
-                        // Shimmer effect for the gradient overlay
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(
-                                            Color.Transparent,
-                                            Color.Black.copy(alpha = 0.7f)
-                                        ),
-                                        startY = 300f
-                                    )
-                                )
-                        )
-
-                        // Shimmer effect for the recipe title
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .fillMaxWidth(0.8f)
-                                .height(24.dp)
-                                .padding(12.dp)
-                                .shimmerEffect()
-                        )
+                        .fillMaxWidth()
+                        .height(250.dp)
+                ) { page ->
+                    recipeUiState.items[page]?.let { recipe ->
+                        RecipeBannerCard(recipe, onRecipeClick)
                     }
                 }
+                // Page Indicator
+                Spacer(modifier = Modifier.height(8.dp))
+                PageIndicator(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    pageSize = recipeUiState.items.size,
+                    selectedPage = pagerState.currentPage
+                )
             }
+        }
 
-            // Shimmer effect for the page indicator
-            Row(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 8.dp)
-            ) {
-                repeat(3) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .shimmerEffect()
-                            .padding(horizontal = 4.dp)
-                    )
-                }
-            }
-        } else if (recipeUiState.items.isEmpty()) {
-            // Show empty state
-            EmptyScreen()
-        } else {
-            // Show actual content
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
-            ) { page ->
-                val recipe = recipeUiState.items[page]
-                val recipeImage = recipe?.itemImage ?: R.drawable.card_shape
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    ),
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxSize(),
-                    onClick = {
-                        recipe?.let { onRecipeClick(it) }
-                    },
-                    elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
-                ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        // Recipe Image (Thumbnail)
-                        GlideImage(
-                            model = recipeImage,
-                            contentDescription = "Recipe Image for Page $page",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        ) {
-                            it.error { placeholder(R.drawable.card_shape) }
-                        }
+    }
+}
 
-                        // Gradient Overlay for better text readability
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(
-                                            Color.Transparent,
-                                            Color.Black.copy(alpha = 0.7f)
-                                        ),
-                                        startY = 300f
-                                    )
-                                )
-                        )
 
-                        // Recipe Name Text - Positioned at the bottom center
-                        if (recipe != null) {
-                            Text(
-                                text = recipe.title,
-                                color = Color.White,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .padding(12.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Page Indicator
-            Spacer(modifier = Modifier.height(8.dp))
-            PageIndicator(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                pageSize = recipeUiState.items.size,
-                selectedPage = pagerState.currentPage
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ShimmerBannerPlaceholder() {
+    HorizontalPager(
+        state = rememberPagerState(pageCount = { 3 }),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp)
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            modifier = Modifier.padding(8.dp).fillMaxSize(),
+            elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize().shimmerEffect()
             )
         }
     }
@@ -402,115 +297,163 @@ fun FeaturedBanner(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
+private fun RecipeBannerCard(recipe: Recipe, onRecipeClick: (Recipe) -> Unit) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        modifier = Modifier.padding(8.dp).fillMaxSize(),
+        onClick = { onRecipeClick(recipe) },
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            GlideImage(
+                model = recipe.itemImage ?: R.drawable.card_shape,
+                contentDescription = "Recipe Image",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            ) { it.error { placeholder(R.drawable.card_shape) } }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Brush.verticalGradient(
+                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                        startY = 300f
+                    ))
+            )
+
+            Text(
+                text = recipe.title,
+                color = Color.White,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.align(Alignment.BottomCenter).padding(12.dp)
+            )
+        }
+    }
+}
+
+
+@Composable
 fun SeasonalBanner(
     recipeUiState: RecipeUiState,
     onRecipeClick: (Recipe) -> Unit,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     val seasonalTag = remember { SeasonalTags.getCurrentSeasonalTag() }
     val seasonalText = seasonalTagToText(seasonalTag)
 
     Column {
-        // Title for the banner
-        Text(
-            text = seasonalText,
-            modifier = modifier.padding(
-                horizontal = dimensionResource(id = R.dimen.list_item_padding),
-                vertical = dimensionResource(id = R.dimen.vertical_margin)
-            ),
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        BannerTitle(seasonalText, modifier)
+        when {
+            recipeUiState.isLoading -> SeasonalShimmerGrid(6)
+            recipeUiState.seasonalRecipes.isEmpty() -> EmptyState()
+            else -> SeasonalRecipeGrid(recipeUiState, onRecipeClick)
+        }
+    }
+}
 
-        // Show shimmer effect or content based on loading state
-        if (recipeUiState.isLoading) {
-            // Shimmer effect for the loading state
-            LazyVerticalGrid(
-                GridCells.Fixed(2),
-                modifier = Modifier.height(500.dp)
-            ) {
-                items(6) { // Show 6 shimmer placeholders
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        ),
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxSize(),
-                        elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
-                    ) {
-                        Column {
-                            // Shimmer effect for the image
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .shimmerEffect()
-                            )
+@Composable
+fun BannerTitle(text: String, modifier: Modifier) {
+    Text(
+        text = text,
+        modifier = modifier.padding(
+            horizontal = dimensionResource(id = R.dimen.list_item_padding),
+            vertical = dimensionResource(id = R.dimen.vertical_margin)
+        ),
+        style = MaterialTheme.typography.headlineMedium,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+}
 
-                            // Shimmer effect for the title
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(24.dp)
-                                    .padding(4.dp)
-                                    .shimmerEffect()
-                            )
-                        }
-                    }
-                }
-            }
-        } else if (recipeUiState.seasonalRecipes.isEmpty()) {
-            // Show empty state image
-            Image(
-                painter = painterResource(id = R.drawable.tray_on_hand),
-                contentDescription = stringResource(id = R.string.tray_on_hand)
-            )
-        } else {
-            // Show actual content
-            LazyVerticalGrid(
-                GridCells.Fixed(2),
-                modifier = Modifier.height(500.dp)
-            ) {
-                items(recipeUiState.seasonalRecipes.size) { index ->
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        ),
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxSize(),
-                        onClick = {
-                            recipeUiState.seasonalRecipes[index]?.let { recipe ->
-                                onRecipeClick(recipe)
-                            }
-                        },
-                        elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
-                    ) {
-                        Column {
-                            GlideImage(
-                                model = recipeUiState.seasonalRecipes[index]?.itemImage,
-                                contentDescription = "Recipe Image for Page $index",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
-                                failure = placeholder(R.drawable.card_shape)
-                            )
-                            recipeUiState.seasonalRecipes[index]?.let { recipe ->
-                                Text(
-                                    text = recipe.title,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(4.dp),
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                        }
-                    }
-                }
+@Composable
+fun SeasonalShimmerGrid(count: Int) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = Modifier.height(500.dp)
+    ) {
+        items(count) {
+            ShimmerCard()
+        }
+    }
+}
+
+@Composable
+fun SeasonalRecipeGrid(
+    recipeUiState: RecipeUiState,
+    onRecipeClick: (Recipe) -> Unit
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = Modifier.height(500.dp)
+    ) {
+        items(recipeUiState.seasonalRecipes.size) { index ->
+            recipeUiState.seasonalRecipes[index]?.let { recipe ->
+                RecipeCard(recipe, onRecipeClick)
             }
         }
     }
 }
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun RecipeCard(recipe: Recipe, onRecipeClick: (Recipe) -> Unit) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize(),
+        onClick = { onRecipeClick(recipe) },
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
+    ) {
+        Column {
+            GlideImage(
+                model = recipe.itemImage,
+                contentDescription = recipe.title,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                failure = placeholder(R.drawable.card_shape)
+            )
+            Text(
+                text = recipe.title,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(4.dp),
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+fun ShimmerCard() {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize(),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation)
+    ) {
+        Column {
+            Box(modifier = Modifier.fillMaxSize().shimmerEffect())
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(24.dp)
+                    .padding(4.dp)
+                    .shimmerEffect()
+            )
+        }
+    }
+}
+
+@Composable
+fun EmptyState() {
+    Image(
+        painter = painterResource(id = R.drawable.tray_on_hand),
+        contentDescription = stringResource(id = R.string.tray_on_hand)
+    )
+}
+
 
 fun seasonalTagToText(tag: String): String {
     return when (tag) {

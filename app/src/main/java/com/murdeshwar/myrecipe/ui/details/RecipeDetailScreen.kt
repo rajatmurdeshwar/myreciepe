@@ -33,6 +33,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Scaffold
@@ -138,7 +139,9 @@ fun RecipeDetailScreen(
                 })
         } ?: run {
             Box(
-                modifier = modifier.fillMaxSize().testTag("loading_indicator"),
+                modifier = modifier
+                    .fillMaxSize()
+                    .testTag("loading_indicator"),
                 contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
@@ -180,6 +183,7 @@ fun DetailComposable(
             Text(
                 text = recipe.recipe.title,
                 fontSize = dimensionResource(id = R.dimen.text_size_large).value.sp,
+                style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -215,7 +219,7 @@ fun DetailComposable(
             )
             Text(
                 text = recipe.recipe.description,
-                style = MaterialTheme.typography.bodyMedium,
+                style =  LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(id = R.dimen.padding_large),
                     vertical = dimensionResource(id = R.dimen.padding_small)
@@ -227,6 +231,7 @@ fun DetailComposable(
             Text(
                 text = "Ingredients",
                 fontWeight = FontWeight.Bold,
+                style =  LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
                 fontSize = dimensionResource(id = R.dimen.text_size_medium).value.sp,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_large))
             )
@@ -235,6 +240,7 @@ fun DetailComposable(
                 Text(
                     text = "${ingredient.originalName}: ${ingredient.amount} ${ingredient.unit}",
                     fontSize = dimensionResource(id = R.dimen.text_size_small).value.sp,
+                    style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(id = R.dimen.padding_large),
                         vertical = dimensionResource(id = R.dimen.padding_small)
@@ -253,12 +259,14 @@ fun DetailComposable(
                 Column(Modifier.padding(dimensionResource(id = R.dimen.padding_large))) {
                     Text(
                         text = "Instructions",
+                        style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
                         fontWeight = FontWeight.Bold,
                         fontSize = dimensionResource(id = R.dimen.text_size_medium).value.sp
                     )
                     recipe.steps.forEach { step ->
                         Text(
                             text = "${step.number}. ${step.step}",
+                            style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
                             fontSize = dimensionResource(id = R.dimen.text_size_small).value.sp,
                             modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_small))
                         )

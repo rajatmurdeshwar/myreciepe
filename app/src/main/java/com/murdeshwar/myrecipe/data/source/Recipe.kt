@@ -1,5 +1,7 @@
 package com.murdeshwar.myrecipe.data.source
 
+import com.google.gson.annotations.SerializedName
+
 data class Recipe(
     val recipeId: Int =0,
     val title: String = "",
@@ -40,6 +42,17 @@ data class User(
     val city: String,
     val email: String,
     val password: String
+)
+
+data class UserData(
+    @SerializedName("name")
+    val name: String,
+    @SerializedName("phone")
+    val phone: String,
+    @SerializedName("city")
+    val city: String,
+    @SerializedName("email")
+    val email: String
 )
 
 data class LoginUser(

@@ -31,12 +31,12 @@ fun RecipeProfileScreen(
         )
 
         user?.let {
-            Text(text = "Name: ${it.name}")
-            Text(text = "Email: ${it.email}")
-            Text(text = "City: ${it.city ?: "N/A"}")
-            Text(text = "Phone: ${it.phonenumber ?: "N/A"}")
+            Text(text = "Name: ${it.name}",style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text(text = "Email: ${it.email}",style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text(text = "City: ${it.city ?: "N/A"}",style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text(text = "Phone: ${it.phone ?: "N/A"}",style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
         } ?: run {
-            Text(text = "Loading...", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Loading...", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }
