@@ -9,13 +9,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
-data class RecipeUiState(
-    val items: List<RecipeSearchData> = emptyList(),
-    val isLoading: Boolean = false,
-    val userMessage: String? = null
-)
 
 @HiltViewModel
 class RecipeSearchViewModel@Inject constructor(
@@ -37,7 +33,11 @@ class RecipeSearchViewModel@Inject constructor(
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
-        getSearchQuery(text)
+        if (text.isNotEmpty()) {
+            getSearchQuery(text)
+        } else {
+            _searchList.value = emptyList()
+        }
     }
 
     fun onToggleSearch() {
@@ -49,9 +49,13 @@ class RecipeSearchViewModel@Inject constructor(
 
     private fun getSearchQuery(searchQuery: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val list = repository.searchRecipe(searchQuery)
-            val nonNullList = list.filterNotNull()
-            _searchList.emit(nonNullList)
+            try {
+                val list = repository.searchRecipe(searchQuery)
+                _searchList.emit(list.filterNotNull()) // Emit only non-null results
+            } catch (e: Exception) {
+                Timber.e(e, "Search query failed: $searchQuery")
+                _searchList.emit(emptyList()) // Clear list on error
+            }
         }
     }
 

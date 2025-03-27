@@ -55,7 +55,7 @@ class HomeViewModel @Inject constructor(
                 Timber.e(e, "Error loading recipes")
                 _recipeUiState.update {
                     it.copy(
-                        userMessage = e.localizedMessage ?: "Error loading recipes",
+                        userMessage =  "Error loading recipes",
                         isLoading = false
                     )
                 }
@@ -76,7 +76,7 @@ class HomeViewModel @Inject constructor(
                 Timber.e(e, "Error fetching seasonal recipe")
                 _recipeUiState.update {
                     it.copy(
-                        userMessage = e.localizedMessage ?: "Error fetching seasonal recipe",
+                        userMessage =  "Error fetching seasonal recipe",
                         isLoading = false
                     )
                 }

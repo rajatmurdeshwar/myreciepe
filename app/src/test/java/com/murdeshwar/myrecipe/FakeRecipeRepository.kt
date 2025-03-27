@@ -8,6 +8,7 @@ import com.murdeshwar.myrecipe.data.source.RecipeSearchData
 import com.murdeshwar.myrecipe.data.source.RecipeWithDetails
 import com.murdeshwar.myrecipe.data.source.Step
 import com.murdeshwar.myrecipe.data.source.User
+import com.murdeshwar.myrecipe.data.source.UserData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,21 +37,10 @@ class FakeRecipeRepository: Repository {
         shouldThrowError = value
     }
 
-    // Pre-populate with mock data for testing
-    init {
-        val mockRecipe = RecipeWithDetails(
-            recipe = Recipe(1, "Recipe Title", "Description", "Vegetarian", "", "", 4, 80, 30, true, false, true),
-            ingredients = listOf(
-                Ingredient(1,1,"Tomato", 2.0, "cups"),
-                Ingredient(1,2,"Onion", 1.0, "piece")
-            ),
-            steps = listOf(
-                Step(1, "Chop the vegetables."),
-                Step(2, "Cook the vegetables.")
-            )
-        )
-        _savedRecipe.value[1] = mockRecipe
+    fun clearAllRecipes() {
+        _savedRecipe.update { LinkedHashMap() }
     }
+
 
     override suspend fun getLocalRecipes(): List<Recipe> {
         if (shouldThrowError) {
@@ -87,6 +77,9 @@ class FakeRecipeRepository: Repository {
     }
 
     override suspend fun insertRecipe(recipe: RecipeWithDetails) {
+        if (shouldThrowError) {
+            throw Exception("Test exception")
+        }
         _savedRecipe.update { oldRecipes ->
             val newRecipes = LinkedHashMap(oldRecipes)
             newRecipes[recipe.recipe.recipeId] = recipe
@@ -121,6 +114,9 @@ class FakeRecipeRepository: Repository {
     }
 
     override suspend fun addRecipesToDb(recipe: Recipe) {
+        if (shouldThrowError) {
+            throw Exception("Test exception")
+        }
         // Simulate adding a recipe to the remote database
         _savedRecipe.update { oldRecipes ->
             val newRecipes = LinkedHashMap(oldRecipes)
@@ -134,15 +130,24 @@ class FakeRecipeRepository: Repository {
         }
     }
 
-    override suspend fun userDetails(): User {
-        TODO("Not yet implemented")
+    override suspend fun userDetails(): UserData {
+        if (shouldThrowError) {
+            throw Exception("Test exception")
+        }
+        return UserData(name = "testUser", phone = "712637332", city = "Dublin", email = "test@example.com")
     }
 
     override suspend fun loginUser(user: LoginUser): String? {
-        TODO("Not yet implemented")
+        if (shouldThrowError) {
+            throw Exception("Test exception")
+        }
+        return if (user.email == "testUser" && user.password == "password") "mockToken123" else null
     }
 
-    override suspend fun signupUser(user: User) {
-        TODO("Not yet implemented")
+    override suspend fun signupUser(user: User): String {
+        if (shouldThrowError) {
+            throw Exception("Test exception")
+        }
+        return "mockSignupToken123"
     }
 }

@@ -6,6 +6,8 @@ import com.murdeshwar.myrecipe.data.source.Recipe
 import com.murdeshwar.myrecipe.data.source.RecipeWithDetails
 import com.murdeshwar.myrecipe.ui.home.HomeViewModel
 import com.google.common.truth.Truth.assertThat
+import com.murdeshwar.myrecipe.data.source.Ingredient
+import com.murdeshwar.myrecipe.data.source.Step
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -34,20 +36,38 @@ class RecipeHomeViewModelTest {
 
         val recipe1 = RecipeWithDetails(
             recipe = Recipe(1, "Recipe 1", "", "Vegetarian", "", "", 0, 0, 0,false,false,false),
-            ingredients = listOf(/* Add ingredient items if required */),
-            steps = listOf(/* Add step items if required */)
+            ingredients = listOf(
+                Ingredient(1,1,"Tomato", 2.0, "cups"),
+                Ingredient(1,2,"Onion", 1.0, "piece")
+            ),
+            steps = listOf(
+                Step(1, "Chop the vegetables."),
+                Step(2, "Cook the vegetables.")
+            )
         )
 
         val recipe2 = RecipeWithDetails(
             recipe = Recipe(0, "Recipe 2", "", "Non-Vegetarian", "", "", 0, 0, 0,false,false,false),
-            ingredients = listOf(/* Add ingredient items if required */),
-            steps = listOf(/* Add step items if required */)
+            ingredients = listOf(
+                Ingredient(1,1,"Tomato", 2.0, "cups"),
+                Ingredient(1,2,"Onion", 1.0, "piece")
+            ),
+            steps = listOf(
+                Step(1, "Chop the vegetables."),
+                Step(2, "Cook the vegetables.")
+            )
         )
 
         val recipe3 = RecipeWithDetails(
             recipe = Recipe(3, "Recipe 3", "", "Vegetarian,Lunch", "", "", 0, 0, 0,false,false,false),
-            ingredients = listOf(/* Add ingredient items if required */),
-            steps = listOf(/* Add step items if required */)
+            ingredients = listOf(
+                Ingredient(1,1,"Tomato", 2.0, "cups"),
+                Ingredient(1,2,"Onion", 1.0, "piece")
+            ),
+            steps = listOf(
+                Step(1, "Chop the vegetables."),
+                Step(2, "Cook the vegetables.")
+            )
         )
 
         // Insert RecipeWithDetails instances asynchronously
@@ -57,16 +77,17 @@ class RecipeHomeViewModelTest {
 
         recipeViewModel = HomeViewModel(recipeRepository)
     }
+
     @Test
     fun loadAllLocalRecipesFromRepository_loadingTogglesAndDataLoaded() = runTest {
 
         recipeViewModel.refreshList()
 
-        //assertThat(recipeViewModel.recipeUiState.first().isLoading).isTrue()
+        assertThat(recipeViewModel.recipeUiState.first().isLoading).isTrue()
 
         advanceUntilIdle()
 
-        //assertThat(recipeViewModel.recipeUiState.first().isLoading).isFalse()
+        assertThat(recipeViewModel.recipeUiState.first().isLoading).isFalse()
 
         assertThat(recipeViewModel.recipeUiState.first().items).hasSize(3)
 
