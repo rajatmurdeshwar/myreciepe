@@ -1,8 +1,12 @@
 package com.murdeshwar.myrecipe
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -13,14 +17,16 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,12 +39,16 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.murdeshwar.myrecipe.ui.details.RecipeDetailScreen
 import com.murdeshwar.myrecipe.ui.favorite.RecipeFavoriteScreen
+import com.murdeshwar.myrecipe.ui.generativeAI.AiSearchScreen
+import com.murdeshwar.myrecipe.ui.generativeAI.AiSearchViewModel
 import com.murdeshwar.myrecipe.ui.home.HomeScreen
 import com.murdeshwar.myrecipe.ui.profile.RecipeProfileScreen
 import com.murdeshwar.myrecipe.ui.search.RecipeSearchScreen
 import com.murdeshwar.myrecipe.util.BottomNavigationItem
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavigation(isOfflineState: StateFlow<Boolean>) {
     val bottomNavController = rememberNavController()
@@ -47,7 +57,14 @@ fun BottomNavigation(isOfflineState: StateFlow<Boolean>) {
     val currentDestination = navBackStackEntry?.destination?.route
 
 
+    var isSheetOpen by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    val coroutineScope = rememberCoroutineScope()
     var isBottomBarVisible by remember { mutableStateOf(true) }
+    val isFABVisible = remember(currentDestination) {
+        currentDestination != RecipeDestinations.RECIPE_DETAIL_ROUTE &&
+                currentDestination != RecipeSearch.RECIPE_SEARCH_ROUTE
+    }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -66,6 +83,17 @@ fun BottomNavigation(isOfflineState: StateFlow<Boolean>) {
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            if (isFABVisible) {
+                FloatingActionButton(onClick = { isSheetOpen = true }) {
+                    Image(
+                        painter = painterResource(id = R.drawable.google_gemini_icon),
+                        contentDescription = "Floating Action Button",
+                        modifier = Modifier.size(24.dp) // Adjust size as needed
+                    )
+                }
+            }
+        },
         bottomBar = {
             if (isBottomBarVisible) {
                 NavigationBar(
@@ -115,7 +143,20 @@ fun BottomNavigation(isOfflineState: StateFlow<Boolean>) {
         val bottomPadding = it.calculateBottomPadding()
         val navActions: RecipeNavigationActions = remember(bottomNavController) {
         RecipeNavigationActions(bottomNavController)
+
     }
+        if (isSheetOpen) {
+            AiSearchScreen(
+                sheetState = sheetState,
+                onDismiss = {
+                    coroutineScope.launch {
+                        sheetState.hide()
+                        isSheetOpen = false
+                    }
+                },
+                viewModel = AiSearchViewModel()
+            )
+        }
         NavHost(
             navController = bottomNavController,
             startDestination = RecipeFavorite.RECIPE_FAV_ROUTE,

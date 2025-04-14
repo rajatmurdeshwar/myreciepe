@@ -31,6 +31,8 @@ android {
         }
         val recipeApiKey = properties.getProperty("RECIPE_API_KEY", "")
         buildConfigField("String", "RECIPE_API_KEY", "\"$recipeApiKey\"")
+        val geminiApiKey = properties.getProperty("GEMINI_API_KEY", "")
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -91,6 +93,8 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
+    implementation(libs.core.ktx)
+    testImplementation(libs.robolectric)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.ui.graphics)
@@ -102,7 +106,7 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.retrofit)
     implementation(libs.retrofit.covertor)
-
+    implementation(libs.generativeai)
     // Architecture Components
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
@@ -112,6 +116,7 @@ dependencies {
 
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
+    testImplementation(libs.mockito.kotlin)
 
     // Hilt
     implementation(libs.hilt.android.core)

@@ -20,8 +20,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -51,7 +49,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -59,8 +56,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.murdeshwar.myrecipe.R
 import com.murdeshwar.myrecipe.data.source.LoginUser
 import com.murdeshwar.myrecipe.data.source.User
-import com.murdeshwar.myrecipe.ui.theme.MyRecipesTheme
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
@@ -141,7 +136,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.weight(0.5f))
 
             if (isLoginScreen) {
-                LoginComposable { loginUser -> userViewModel.login(loginUser) }
+                LoginComposable{ loginUser -> userViewModel.login(loginUser) }
             } else {
                 SignUpComposable { user -> userViewModel.signup(user) }
             }
@@ -162,7 +157,8 @@ fun LoginScreen(
 
 @Composable
 fun SignUpComposable(
-    onSignUpSubmitClick: (User) -> Unit
+    modifier: Modifier = Modifier,
+    onSignUpSubmitClick: (User) -> Unit,
 ) {
     var name by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
@@ -178,7 +174,7 @@ fun SignUpComposable(
     var passwordError by remember { mutableStateOf<String?>(null) }
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -296,6 +292,7 @@ fun SignUpComposable(
 
 @Composable
 fun LoginComposable(
+    modifier: Modifier = Modifier,
     onLoginSubmitClick: (LoginUser) -> Unit
 ) {
     var username by remember { mutableStateOf("") }
@@ -306,11 +303,11 @@ fun LoginComposable(
     var isLoading by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth().padding(vertical = 8.dp),
             label = { Text("Email", color = MaterialTheme.colorScheme.onSurface) },
             leadingIcon = { Icon(Icons.Filled.Email, null) },
@@ -331,7 +328,7 @@ fun LoginComposable(
         )
 
         OutlinedTextField(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             label = { Text("Password", color = MaterialTheme.colorScheme.onSurface) },
@@ -361,7 +358,7 @@ fun LoginComposable(
         )
 
         Button(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = modifier.padding(top = 16.dp),
             onClick = {
                 if (usernameError == null && passwordError == null) {
                     isLoading = false
@@ -372,7 +369,7 @@ fun LoginComposable(
             enabled = usernameError == null && passwordError == null
         ) {
             if (isLoading) {
-                CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(24.dp))
+                CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = modifier.size(24.dp))
             } else {
                 Text(text = "Log In", fontWeight = FontWeight.Bold, color = Color.White)
             }
